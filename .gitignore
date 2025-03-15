@@ -1,0 +1,18 @@
+# Django 相关
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+db.sqlite3
+media/
+
+# IDE 相关
+.idea/
+.vscode/
+
+# 其他
+*.log
+.env
+*.local
+avatar.jpg

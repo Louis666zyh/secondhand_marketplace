@@ -1,38 +1,45 @@
-from django.shortcuts import render
-
-# Create your views here.
-from rest_framework import permissions
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .models import Product
-from .serializers import ProductSerializer
+from rest_framework import generics, permissions
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from .models import Product, Category
+from .serializers import ProductSerializer, CategorySerializer
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
-    自定义权限：只允许商品的拥有者修改商品，其他人只能读取。
+    Custom permissions: Only the owner of the product is allowed to modify the product, while others can only read it.
     """
-
     def has_object_permission(self, request, view, obj):
-        # 任何人都可以读取
         if request.method in permissions.SAFE_METHODS:
             return True
-        # 只有商品的卖家才能修改
         return obj.seller == request.user
 
 
 class ProductListView(generics.ListCreateAPIView):
-    queryset = Product.objects.all()
+    """ Product List & Create Product"""
+    queryset = Product.objects.all().order_by("-created_at")
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ["category", "status"]
+    search_fields = ["name", "description"]
+    ordering_fields = ["price", "created_at"]
 
+    def perform_create(self, serializer):
+        serializer.save(seller=self.request.user)
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """ Product Details & Update & Delete"""
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsOwnerOrReadOnly]
 
+    def perform_update(self, serializer):
+        if self.request.user == serializer.instance.seller:
+            serializer.save()
 
-
-
-
+class CategoryListCreateView(generics.ListCreateAPIView):
+    """ Category List & Create Category"""
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]

@@ -13,12 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include  # ← 这里需要导入 include
 from django.http import JsonResponse
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import path, include
+
 
 def home_view(request):
     return JsonResponse({"message": "Welcome to Secondhand Marketplace API!"})
+
 
 urlpatterns = [
     path('', home_view),  # 添加默认首页
@@ -28,4 +32,10 @@ urlpatterns = [
     path('api/transactions/', include('apps.transactions.urls')),
     path('api/reviews/', include('apps.reviews.urls')),
     path('api/chat/', include('apps.chat.urls')),
+    path('api/cart/', include('apps.cart.urls')),
+    path('api/admin/', include('apps.admin_panel.urls')),  # 添加这一行
 ]
+
+# 允许 Django 在开发环境下提供媒体文件
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
