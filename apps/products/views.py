@@ -3,6 +3,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Product, Category
 from .serializers import ProductSerializer, CategorySerializer
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -20,6 +21,7 @@ class ProductListView(generics.ListCreateAPIView):
     queryset = Product.objects.all().order_by("-created_at")
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    parser_classes = [ MultiPartParser, FormParser ]  # ✅ 允许上传文件
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["category", "status"]
     search_fields = ["name", "description"]

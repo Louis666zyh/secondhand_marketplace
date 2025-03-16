@@ -38,6 +38,7 @@ class Product(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, help_text="Timestamp when the product was created.")
     is_approved = models.BooleanField(default=False, help_text="Indicates whether the product is approved by an admin.")
+    image = models.ImageField(upload_to="product_images/", null=True, blank=True, help_text="Product image")
 
     def __str__(self):
         return f"{self.name} - {self.status}"

@@ -14,7 +14,7 @@ class AdminProductSerializer(serializers.ModelSerializer):
     """Serializer for product approval by admin."""
     class Meta:
         model = Product
-        fields = ["id", "name", "is_approved"]
+        fields = ["id", "name", "is_approved", "image"]
         extra_kwargs = {"is_approved": {"required": True}}
 
 class AdminTransactionSerializer(serializers.ModelSerializer):
