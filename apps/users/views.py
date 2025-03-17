@@ -73,7 +73,7 @@ class AvatarUploadView(APIView):
 
 class RegisterView(APIView):
     """User registration API"""
-
+    permission_classes = [ AllowAny ]
     def post(self, request):
         username = request.data.get("username")
         email = request.data.get("email")

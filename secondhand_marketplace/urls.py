@@ -18,23 +18,26 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import render
 
 
 def home_view(request):
-    return JsonResponse({"message": "Welcome to Secondhand Marketplace API!"})
+    """Render the homepage instead of returning JSON."""
+    return render(request, "index.html")
 
 
 urlpatterns = [
-    path('', home_view),  # 添加默认首页
-    path('admin/', admin.site.urls),
-    path('api/users/', include('apps.users.urls')),
-    path('api/products/', include('apps.products.urls')),
-    path('api/transactions/', include('apps.transactions.urls')),
-    path('api/reviews/', include('apps.reviews.urls')),
-    path('api/chat/', include('apps.chat.urls')),
-    path('api/cart/', include('apps.cart.urls')),
-    path('api/admin/', include('apps.admin_panel.urls')),  # 添加这一行
-]
+                  path('', home_view),  # 添加默认首页
+                  path('admin/', admin.site.urls),
+                  path('api/users/', include('apps.users.urls')),
+                  path('api/products/', include('apps.products.urls')),
+                  path('api/transactions/', include('apps.transactions.urls')),
+                  path('api/reviews/', include('apps.reviews.urls')),
+                  path('api/chat/', include('apps.chat.urls')),
+                  path('api/cart/', include('apps.cart.urls')),
+                  path('api/admin/', include('apps.admin_panel.urls')),
+                  path("frontend/", include("apps.frontend.urls")),
+              ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
 
 # 允许 Django 在开发环境下提供媒体文件
 if settings.DEBUG:

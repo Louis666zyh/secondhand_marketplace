@@ -11,6 +11,7 @@ class ProductSerializer(serializers.ModelSerializer):
     """Serializer for products"""
     seller = serializers.HiddenField(default=serializers.CurrentUserDefault())
     image = serializers.ImageField(required=False)
+    category = serializers.CharField(source='category.name')
     class Meta:
         model = Product
         fields = '__all__'

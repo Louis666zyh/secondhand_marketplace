@@ -39,6 +39,8 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, help_text="Timestamp when the product was created.")
     is_approved = models.BooleanField(default=False, help_text="Indicates whether the product is approved by an admin.")
     image = models.ImageField(upload_to="product_images/", null=True, blank=True, help_text="Product image")
+    available_until = models.DateField(null=True, blank=True, help_text="Date until which the product is available.")
+    location = models.CharField(max_length=255, blank=True, null=True, help_text="Location of the product.")
 
     def __str__(self):
         return f"{self.name} - {self.status}"
