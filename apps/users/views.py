@@ -7,6 +7,7 @@ from django.core.files.storage import default_storage
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.timezone import now
+from django.contrib.auth import login
 
 User = get_user_model()
 
@@ -116,6 +117,8 @@ class LoginView(APIView):
         if user and user.check_password(password):
             if not user.is_active:
                 return Response({"error": "Account is inactive"}, status=status.HTTP_400_BAD_REQUEST)
+
+            login(request, user)
 
             refresh = RefreshToken.for_user(user)
             return Response({

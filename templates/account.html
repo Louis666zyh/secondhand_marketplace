@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GlasgowasteLess - Account</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --navy-blue: #002147; /* 藏蓝色 */
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        /* 导航栏使用浅色风格 */
+        nav.navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 自定义蓝色按钮样式 */
+        .btn-primary {
+            background-color: var(--navy-blue) !important;
+            border-color: var(--navy-blue) !important;
+        }
+
+        .btn-primary:hover {
+            background-color: #001f3f !important;
+            border-color: #001f3f !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--navy-blue) !important;
+            border-color: var(--navy-blue) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--navy-blue) !important;
+            color: #fff !important;
+            border-color: var(--navy-blue) !important;
+        }
+
+        .text-primary {
+            color: var(--navy-blue) !important;
+        }
+
+        /* 个人信息区 */
+        header.profile-header {
+            background: #fff;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        header.profile-header img {
+            width: 120px;
+            height: 120px;
+        }
+
+        header.profile-header h2 {
+            font-size: 1.75rem;
+        }
+
+        /* 数据卡片区域 */
+        .profile-stats .col {
+            border-right: 1px solid #dee2e6;
+        }
+
+        .profile-stats .col:last-child {
+            border-right: none;
+        }
+
+        /* 统一卡片样式 */
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        /* 评价卡片 */
+        .comment-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        /* 调整选项卡样式 */
+        .nav-tabs .nav-link {
+            font-weight: 500;
+            color: var(--navy-blue) !important;
+
+        }
+    </style>
+</head>
+<body>
+
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}">GlasgowasteLess</a>
+        <div>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'chat' %}"><i class="bi bi-chat-dots fs-4"></i></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 用户信息区 -->
+<header class="profile-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <img src="https://placekitten.com/120/120" class="rounded-circle" alt="User Avatar">
+            </div>
+            <div class="col">
+                <h2 class="mb-0">
+                    {{ user.username }}
+                </h2>
+                <div class="mt-2"><i class="bi bi-geo-alt me-1"></i> University of Glasgow</div>
+            </div>
+        </div>
+        <!-- 数据概览 -->
+        <div class="row mt-4 text-center profile-stats">
+            <div class="col-md-3">
+                <div class="text-muted small">Transactions</div>
+                <div class="h4 fw-bold">189</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted small">Followers</div>
+                <div class="h4 fw-bold">2.3k</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted small">Items for Sale</div>
+                <div class="h4 fw-bold">23</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted small">Return Rate</div>
+                <div class="h4 fw-bold">82%</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- 主体内容 -->
+<main class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#selling">
+                    <i class="bi bi-box-seam me-2"></i> Items for Sale (23)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#reviews">
+                    <i class="bi bi-chat-square-text me-2"></i> Buyer Reviews (76)
+                </a>
+            </li>
+        </ul>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary">Follow Seller</button>
+            <button class="btn btn-primary">Message Seller</button>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <!-- 在售商品 -->
+        <div class="tab-pane fade show active" id="selling">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <!-- 商品卡片 -->
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="https://placekitten.com/400/300" class="card-img-top" alt="Product Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Vintage Film Camera</h5>
+                            <p class="card-text mb-1">
+                                <span class="text-danger fw-bold fs-5">£85</span>
+                                <del class="text-muted ms-2">£120</del>
+                            </p>
+                            <p class="card-text text-muted small">Includes full accessories, in good condition, perfect
+                                for photography enthusiasts</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="text-primary small">
+                                    <i class="bi bi-eye me-1"></i>235
+                                    <i class="bi bi-heart ms-3 me-1"></i>34
+                                </div>
+                                <button class="btn btn-sm btn-primary">Contact Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 更多商品卡片可在此添加 -->
+            </div>
+        </div>
+
+        <!-- 买家评价 -->
+        <div class="tab-pane fade" id="reviews">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="comment-card">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="https://placekitten.com/45/45" class="rounded-circle me-3" alt="Buyer Avatar">
+                            <div>
+                                <h6 class="mb-0">Eco Buyer Sarah</h6>
+                                <div class="small text-muted"><i class="bi bi-star-fill"></i> 5.0 · 2023-10-15</div>
+                            </div>
+                            <div class="ms-auto">
+                                <button class="btn btn-link text-muted">
+                                    <i class="bi bi-hand-thumbs-up"></i> 12
+                                </button>
+                            </div>
+                        </div>
+                        <p class="mb-2">Item condition exceeded expectations, seller was very responsive, and the
+                            packaging was eco-friendly!</p>
+                        <div class="d-flex gap-2">
+                            <img src="https://placekitten.com/80/80" class="rounded"
+                                 style="width:60px;height:60px;object-fit:cover;" alt="Review Image 1">
+                            <img src="https://placekitten.com/81/81" class="rounded"
+                                 style="width:60px;height:60px;object-fit:cover;" alt="Review Image 2">
+                        </div>
+                    </div>
+                </div>
+                <!-- 更多评价卡片可在此添加 -->
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</body>
+</html>

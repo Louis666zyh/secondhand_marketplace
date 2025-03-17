@@ -29,7 +29,7 @@ ALLOWED_HOSTS = [ ]
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',  # 确保这一行存在
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -147,3 +147,7 @@ AUTH_USER_MODEL = 'users.User'
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
