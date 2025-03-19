@@ -131,11 +131,11 @@
 
   <div class="container-fluid mt-4">
     <div class="row g-4">
-      <!-- 左侧导航 -->
+      <!-- Left navigation -->
       <div class="col-lg-3">
         <div class="card shadow-sm">
           <div class="card-body text-center position-relative">
-            <!-- 头像上传 -->
+            <!-- Upload avatar -->
             <form id="avatar-form" method="post" enctype="multipart/form-data" action="{% url 'upload_avatar' %}">
               {% csrf_token %}
               <input type="file" name="avatar" id="avatar-input" style="display: none;" accept="image/*">
@@ -143,7 +143,7 @@
               <div class="text-muted mt-2">Click to upload</div>
             </form>
 
-            <!-- 用户信息 -->
+            <!-- User Information -->
             <h4 class="mt-3" id="username">{{ user.username }}</h4>
             <p class="text-muted" id="userEmail">{{ user.email }}</p>
             <p class="fst-italic" id="userBio">
@@ -158,7 +158,7 @@
             </button>
           </div>
 
-          <!-- 导航菜单 -->
+          <!-- Navigation Menu -->
           <ul class="list-group list-group-flush">
             <li class="list-group-item {% if section == 'selling' %}active{% endif %}" data-section="selling" id="myListingsTab">
               <i class="bi bi-box-seam me-2"></i>My Listings
@@ -179,7 +179,7 @@
         </div>
       </div>
 
-      <!-- 主内容区 -->
+      <!-- Main content area -->
       <div class="col-lg-9">
         <div class="tab-content">
           <!-- My Listings -->
@@ -263,7 +263,7 @@
           <!-- My Orders -->
           <div class="tab-pane fade {% if section == 'orders' %}show active{% endif %}" id="orders">
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="ordersContainer">
-              <!-- 订单将动态加载 -->
+              <!-- Orders will be loaded dynamically -->
             </div>
           </div>
 
@@ -292,7 +292,7 @@
     </div>
   </div>
 
-  <!-- 编辑资料模态框 -->
+  <!-- Edit data modal box -->
   <div class="modal fade" id="editModal">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -324,7 +324,7 @@
     </div>
   </div>
 
-  <!-- 评价模态框 -->
+  <!-- Evaluation modal box -->
   <div class="modal fade" id="reviewModal">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -356,7 +356,7 @@
     </div>
   </div>
 
-  <!-- 在 <body> 末尾添加数据 -->
+  <!-- Add data at the end of <body> -->
   <script type="application/json" id="listings-data">
     {{ listings_data|json_script:"listings-data" }}
   </script>
@@ -367,12 +367,12 @@
     {{ reviews_data|json_script:"reviews-data" }}
   </script>
 
-  <!-- 脚本 -->
+ <!-- Script -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
 $(function() {
-  // 设置全局 CSRF 令牌
+  // Set the global CSRF token
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -398,19 +398,19 @@ $(function() {
     }
   });
 
-  // 获取 token
+  // Get token
   function getToken() {
     const token = localStorage.getItem("access_token");
     if (!token) {
       console.warn("No token found in localStorage. Please log in.");
-      alert("请登录以查看您的收藏。");
+      alert("Please log in to view your likes.");
       window.location.href = "{% url 'login' %}?next={% url 'account' %}";
       return null;
     }
     return token;
   }
 
-  // 初始化用户数据
+  // Initialize user data
   let userData = {
     username: "{{ user.username|escapejs }}",
     email: "{{ user.email|escapejs }}",
@@ -421,12 +421,12 @@ $(function() {
     orders: []
   };
 
-  // 获取用户的 listings 数据
+  // Get user's listings data
   function fetchListingsData() {
     const accessToken = getToken();
     if (!accessToken) return;
 
-    const userId = {{ user.id }}; // 从模板中获取当前用户的 ID
+    const userId = {{ user.id }}; // Get the current user's ID from the template
     console.log("Fetching listings data for user ID:", userId);
     $.ajax({
       url: `/api/products/?seller=${userId}`,
@@ -452,10 +452,10 @@ $(function() {
       error: function(xhr) {
         console.error('Failed to fetch listings data:', xhr.status, xhr.responseText);
         if (xhr.status === 401) {
-          alert('请登录以查看您的商品。');
+          alert('Please log in to view your items.');
           window.location.href = "{% url 'login' %}?next={% url 'account' %}";
         } else {
-          alert('无法加载商品数据：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+          alert('Unable to load product data：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
           userData.listings = [];
           renderListings(userData.listings);
         }
@@ -463,7 +463,7 @@ $(function() {
     });
   }
 
-  // 获取最新的收藏数据
+  // Get the latest collection data
   function fetchLikesData() {
     const accessToken = getToken();
     if (!accessToken) return;
@@ -481,7 +481,7 @@ $(function() {
         const contentType = xhr.getResponseHeader('Content-Type');
         if (!contentType || !contentType.includes('application/json')) {
           console.error('Unexpected response format:', response);
-          alert('错误：服务器返回了非预期的响应格式。');
+          alert('Error: The server returned a response in an unexpected format.');
           return;
         }
         userData.likes = response.map(item => ({
@@ -496,7 +496,7 @@ $(function() {
       error: function(xhr) {
         console.error('Failed to fetch likes data:', xhr.status, xhr.responseText);
         if (xhr.status === 401) {
-          alert('请登录以查看您的收藏。');
+          alert('Please log in to view your collection.');
           window.location.href = "{% url 'login' %}?next={% url 'account' %}";
         } else {
           alert('无法加载收藏数据：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
@@ -505,7 +505,7 @@ $(function() {
     });
   }
 
-  // 获取订单数据
+  // Get order data
   function fetchOrdersData() {
     const accessToken = getToken();
     if (!accessToken) return;
@@ -536,14 +536,14 @@ $(function() {
       error: function(xhr) {
         console.error('Failed to fetch orders:', xhr.status, xhr.responseText);
         if (xhr.status === 401) {
-          alert('请登录以查看您的订单。');
+          alert('Please log in to view your orders.');
           window.location.href = "{% url 'login' %}?next={% url 'account' %}";
         }
       }
     });
   }
 
-  // 获取用户的 reviews 数据
+  // Get the user's reviews data
   function fetchReviewsData() {
     const accessToken = getToken();
     if (!accessToken) return;
@@ -572,10 +572,10 @@ $(function() {
       error: function(xhr) {
         console.error('Failed to fetch reviews data:', xhr.status, xhr.responseText);
         if (xhr.status === 401) {
-          alert('请登录以查看您的评价。');
+          alert('Please log in to view your reviews.');
           window.location.href = "{% url 'login' %}?next={% url 'account' %}";
         } else {
-          alert('无法加载评价数据：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+          alert('Unable to load review data:' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
           userData.reviews = [];
           renderReviews(userData.reviews);
         }
@@ -583,7 +583,7 @@ $(function() {
     });
   }
 
-  // 初始化页面
+  // Initialize page
   function initProfile() {
     $('#username').text(userData.username);
     $('#userEmail').text(userData.email);
@@ -604,7 +604,7 @@ $(function() {
     }
   }
 
-  // 渲染 My Listings
+  // Render My Listings
   function renderListings(listings) {
     const container = $('#listingContainer');
     container.empty();
@@ -640,7 +640,7 @@ $(function() {
     });
   }
 
-  // 渲染 My Likes
+  // Render My Likes
   function renderLikes(likes) {
     const container = $('#likesContainer');
     container.empty();
@@ -681,7 +681,7 @@ $(function() {
     });
   }
 
-  // 渲染 Reviews
+  // Render Reviews
   function renderReviews(reviews) {
     const container = $('#reviewsContainer');
     container.empty();
@@ -698,7 +698,7 @@ $(function() {
     });
   }
 
-  // 渲染 My Orders
+  // Render My Orders
   function renderOrders(orders) {
     const container = $('#ordersContainer');
     container.empty();
@@ -706,26 +706,26 @@ $(function() {
       container.html(`
         <div class="col-12 text-center py-5 empty-state">
           <i class="bi bi-cart fs-1 text-muted"></i>
-          <p class="mt-3">暂无订单。</p>
+          <p class="mt-3">No orders yet.</p>
         </div>
       `);
       return;
     }
     orders.forEach(order => {
-      const role = order.is_buyer ? `卖家: ${order.seller}` : `买家: ${order.buyer}`;
+      const role = order.is_buyer ? `Seller: ${order.seller}` : `Buyers: ${order.buyer}`;
       let buyerButtons = '';
       if (order.is_buyer) {
         const canReceive = (order.status === 'shipped' || (order.status === 'paid' && order.delivery_method === 'face-to-face')) && order.status !== 'received';
         const receiveButton = canReceive
-          ? `<button class="btn btn-success btn-sm receive-btn" data-transaction-id="${order.id}">收货</button>`
-          : `<button class="btn btn-success btn-sm" disabled>已收货</button>`;
+          ? `<button class="btn btn-success btn-sm receive-btn" data-transaction-id="${order.id}">Received</button>`
+          : `<button class="btn btn-success btn-sm" disabled>Received</button>`;
         const reviewButton = order.status === 'received' && !order.reviewed
-          ? `<button class="btn btn-primary btn-sm review-btn" data-transaction-id="${order.id}">评价</button>`
+          ? `<button class="btn btn-primary btn-sm review-btn" data-transaction-id="${order.id}">review</button>`
           : order.status === 'received' && order.reviewed
-            ? `<button class="btn btn-primary btn-sm" disabled>已评价</button>`
+            ? `<button class="btn btn-primary btn-sm" disabled>Rated</button>`
             : '';
         const returnButton = order.status === 'received' && order.return_status === 'none'
-          ? `<button class="btn btn-warning btn-sm return-btn" data-transaction-id="${order.id}">请求退货</button>`
+          ? `<button class="btn btn-warning btn-sm return-btn" data-transaction-id="${order.id}">Request a Return</button>`
           : '';
         buyerButtons = `
           ${receiveButton}
@@ -737,14 +737,14 @@ $(function() {
       if (!order.is_buyer) {
         const canShip = order.status === 'paid' && order.status !== 'shipped';
         const shipButton = canShip
-          ? `<button class="btn btn-success btn-sm ship-btn" data-transaction-id="${order.id}">发货</button>`
-          : `<button class="btn btn-success btn-sm" disabled>已发货</button>`;
+          ? `<button class="btn btn-success btn-sm ship-btn" data-transaction-id="${order.id}">shipped</button>`
+          : `<button class="btn btn-success btn-sm" disabled>Shipped</button>`;
         const returnAction = order.return_status === 'requested'
           ? `
             <select class="form-select handle-return-btn" data-transaction-id="${order.id}">
-              <option value="">处理退货</option>
-              <option value="approve">同意退货</option>
-              <option value="deny">拒绝退货</option>
+              <option value="">Processing returns</option>
+              <option value="approve">Agree to return</option>
+              <option value="deny">Refuse to return</option>
             </select>
           `
           : '';
@@ -754,18 +754,18 @@ $(function() {
         `;
       }
       const deliveryInfo = order.delivery_method === 'shipping'
-        ? `<p class="mb-0"><i class="bi bi-truck"></i> 快递: ${order.shipping_address || '无地址'}</p>`
-        : `<p class="mb-0"><i class="bi bi-truck"></i> 面对面</p>`;
+        ? `<p class="mb-0"><i class="bi bi-truck"></i> shiping: ${order.shipping_address || '无地址'}</p>`
+        : `<p class="mb-0"><i class="bi bi-truck"></i> Face to face</p>`;
       const html = `
         <div class="col">
           <div class="card product-card" data-order-id="${order.id}">
             <div class="card-body">
               <h5 class="card-title">${order.product}</h5>
-              <p class="card-text text-muted mb-1">订单编号: ${order.order_serial}</p>
+              <p class="card-text text-muted mb-1">Order Number: ${order.order_serial}</p>
               <p class="fw-bold">£${order.price}</p>
               ${deliveryInfo}
-              <p class="mb-0"><i class="bi bi-info-circle"></i> 状态: ${order.status}</p>
-              <p class="mb-0"><i class="bi bi-arrow-return-left"></i> 退货状态: ${order.return_status || '无'}</p>
+              <p class="mb-0"><i class="bi bi-info-circle"></i> state: ${order.status}</p>
+              <p class="mb-0"><i class="bi bi-arrow-return-left"></i> Return Status: ${order.return_status || '无'}</p>
               <p class="mb-0">${role}</p>
               <div class="d-grid gap-2 mt-2">
                 ${order.is_buyer ? buyerButtons : sellerButtons}
@@ -778,7 +778,7 @@ $(function() {
     });
   }
 
-  // 导航切换处理
+  // Navigation switch processing
   $('.list-group-item').click(function() {
     const section = $(this).data('section');
     console.log("Switching to section:", section);
@@ -796,11 +796,11 @@ $(function() {
       console.log("Fetching orders...");
       fetchOrdersData();
     } else if (section === 'settings') {
-      // 密码修改表单已通过 HTML 渲染，无需额外处理
+      // The password change form has been rendered via HTML, no additional processing is required
     }
   });
 
-  // 取消收藏处理
+  //Cancel collection processing
   $(document).on('click', '.unlike-btn', function() {
     const itemId = $(this).data('id');
     const accessToken = getToken();
@@ -818,16 +818,16 @@ $(function() {
       },
       error: function(xhr) {
         if (xhr.status === 401) {
-          alert('请登录以移除收藏。');
+          alert('Please log in to remove a favorite.');
           window.location.href = "{% url 'login' %}?next={% url 'account' %}";
         } else {
-          alert('无法移除收藏：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+          alert('Unable to remove favorite:' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
         }
       }
     });
   });
 
-  // 收货按钮
+  // Receive button
   $(document).on('click', '.receive-btn', function() {
     const transactionId = $(this).data('transaction-id');
     const accessToken = getToken();
@@ -838,16 +838,16 @@ $(function() {
       type: 'POST',
       headers: { 'Authorization': 'Bearer ' + accessToken },
       success: function(response) {
-        alert('收货成功！');
+        alert('Successful receipt！');
         fetchOrdersData();
       },
       error: function(xhr) {
-        alert('收货失败：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        alert('Failed to receive goods：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
       }
     });
   });
 
-  // 发货按钮
+ //Shipping button
   $(document).on('click', '.ship-btn', function() {
     const transactionId = $(this).data('transaction-id');
     const accessToken = getToken();
@@ -858,19 +858,19 @@ $(function() {
       type: 'POST',
       headers: { 'Authorization': 'Bearer ' + accessToken },
       success: function(response) {
-        alert('发货成功！');
+        alert('Delivery Success！');
         fetchOrdersData();
       },
       error: function(xhr) {
-        alert('发货失败：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        alert('Delivery failed：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
       }
     });
   });
 
-  // 请求退货按钮
+  // Request return button
   $(document).on('click', '.return-btn', function() {
     const transactionId = $(this).data('transaction-id');
-    const reason = prompt('请输入退货原因：');
+    const reason = prompt('Please enter the reason for return：');
     if (!reason) return;
     const accessToken = getToken();
     if (!accessToken) return;
@@ -881,16 +881,16 @@ $(function() {
       headers: { 'Authorization': 'Bearer ' + accessToken },
       data: { reason: reason },
       success: function(response) {
-        alert('退货请求已提交！');
+        alert('Return request submitted!');
         fetchOrdersData();
       },
       error: function(xhr) {
-        alert('退货请求失败：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        alert('Return request failed：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
       }
     });
   });
 
-  // 处理退货下拉框
+  // Process Returns drop-down box
   $(document).on('change', '.handle-return-btn', function() {
     const transactionId = $(this).data('transaction-id');
     const action = $(this).val();
@@ -904,23 +904,23 @@ $(function() {
       headers: { 'Authorization': 'Bearer ' + accessToken },
       data: { action: action },
       success: function(response) {
-        alert(`退货已${action === 'approve' ? '同意' : '拒绝'}！`);
+        alert(`Return has been ${action === 'approve' ? 'Agree' : 'Reject'}！`);
         fetchOrdersData();
       },
       error: function(xhr) {
-        alert(`退货处理失败：` + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        alert(`Return processing failed：` + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
       }
     });
   });
 
-  // 打开评价模态框
+  // Open the review modal box
   $(document).on('click', '.review-btn', function() {
     const transactionId = $(this).data('transaction-id');
     $('#review-transaction-id').val(transactionId);
     $('#reviewModal').modal('show');
   });
 
-  // 提交评价
+  // Submit Review
   $('#reviewForm').submit(function(e) {
     e.preventDefault();
     const formData = new FormData(this);
@@ -936,17 +936,17 @@ $(function() {
       contentType: false,
       headers: { 'Authorization': 'Bearer ' + accessToken },
       success: function(response) {
-        alert('评价提交成功！');
+        alert('Review submitted successfully！');
         $('#reviewModal').modal('hide');
         fetchOrdersData();
       },
       error: function(xhr) {
-        alert('评价提交失败：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        alert('Review submission failed：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
       }
     });
   });
 
-  // 密码修改提交处理
+  // Password modification submission processing
   $('#passwordForm').submit(function(e) {
     e.preventDefault();
     const formData = $(this).serialize();
@@ -962,15 +962,15 @@ $(function() {
         withCredentials: true
       },
       success: function(response) {
-        alert('密码更新成功！');
+        alert('Password updated successfully！');
       },
       error: function(xhr) {
-        alert('密码更新失败：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        alert('Password update failed：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
       }
     });
   });
 
-  // 头像上传处理
+  // Avatar upload processing
   $('#avatar-input').change(function(e) {
     var formData = new FormData($('#avatar-form')[0]);
     const accessToken = getToken();
@@ -989,16 +989,16 @@ $(function() {
       success: function(response) {
         $('#avatar-img').attr('src', response.avatar);
         userData.avatar = response.avatar;
-        alert('头像上传成功！');
+        alert('Avatar uploaded successfully！');
         window.location.href = "{% url 'account' %}";
       },
       error: function(xhr) {
-        alert('上传失败：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        alert('Upload failed：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
       }
     });
   });
 
-  // 初始化页面
+ // Initialize the page
   initProfile();
 });
 </script></body>

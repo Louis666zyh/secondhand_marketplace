@@ -5,7 +5,7 @@ from django.conf import settings
 class User(AbstractUser):
     first_name = models.CharField(max_length=30, blank=False)
     last_name = models.CharField(max_length=30, blank=False)
-    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
+    avatar = models.ImageField(upload_to="avatars/", default='img/no-image.png',null=True, blank=True)
     is_approved = models.BooleanField(default=False, help_text="Indicates whether the user is approved by an admin.")
     is_online = models.BooleanField(default=False)
     last_seen = models.DateTimeField(null=True, blank=True)
