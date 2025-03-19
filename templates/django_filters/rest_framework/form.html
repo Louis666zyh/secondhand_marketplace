@@ -1,0 +1,9 @@
+<!-- templates/django_filters/rest_framework/form.html -->
+<form method="get" class="filter-form">
+    {% for field in filter.form %}
+        <div class="form-group">
+            {{ field.label_tag }} {{ field }}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Apply Filters</button>
+</form>

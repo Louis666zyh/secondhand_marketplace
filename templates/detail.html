@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GlasgowasteLess - Product Details</title>
+    {% load static %}
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
+    <!-- 自定义 CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <style>
+        :root {
+            --theme-color: #003366;
+            --price-color: #ff4444;
+            --bs-primary: #002147;
+            --chat-border-color: #4682b4;
+            --like-border-color: #ff6347;
+            --buy-border-color: #28a745;
+        }
+
+        #seller-avatar {
+            width: 80px;
+            height: 80px;
+        }
+
+        .search-container {
+            margin-left: 10px;
+            padding-left: 0;
+            width: 600px;
+        }
+
+
+        .sticky-aside {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+            max-width: 400px;
+            padding: 20px;
+            margin-left: auto;
+        }
+
+        #productCarousel {
+            max-width: 500px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .carousel-inner {
+            border-radius: 8px;
+        }
+
+        .carousel-item img {
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        .magnify {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            background-repeat: no-repeat;
+            background-size: 400%;
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1000;
+        }
+
+        .carousel-item:hover .magnify {
+            display: block;
+        }
+
+        .btn-chat {
+            border: 2px solid var(--chat-border-color);
+            color: var(--chat-border-color);
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            background: none;
+        }
+
+        .btn-chat:hover {
+            background-color: var(--chat-border-color);
+            color: #fff;
+        }
+
+        .btn-like {
+            border: 2px solid var(--like-border-color);
+            color: var(--like-border-color);
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            background: none;
+        }
+
+        .btn-like:hover {
+            background-color: var(--like-border-color);
+            color: #fff;
+        }
+
+        .btn-like.active {
+            background-color: var(--like-border-color);
+            color: #fff;
+        }
+
+        .btn-buy {
+            border: 2px solid var(--buy-border-color);
+            color: var(--buy-border-color);
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            background: none;
+        }
+
+        .btn-buy:hover {
+            background-color: var(--buy-border-color);
+            color: #fff;
+        }
+
+        .detail-info-card {
+            margin-left: 0;
+            margin-right: 0;
+            width: 100%;
+        }
+
+        .detail-info-card .card-body {
+            padding: 20px;
+        }
+
+        .content-fold {
+            max-height: 200px;
+            overflow-y: auto;
+            transition: max-height 0.3s ease;
+        }
+
+        .detail-info-card .card-title {
+            margin-bottom: 15px;
+            display: block;
+            text-align: center;
+        }
+
+        .thumbnail-list {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .thumbnail-list .img-thumbnail {
+            width: 100px;
+            height: 75px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .thumbnail-list .img-thumbnail img {
+            max-width: 80%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        .thumbnail-list .img-thumbnail:hover {
+            transform: scale(1.1);
+        }
+
+        .thumbnail-list .thumbnail-item {
+            position: relative;
+        }
+
+        .thumbnail-list {
+            --center-index: calc(var(--total-thumbnails, 1) / 2 - 0.5);
+        }
+
+        .thumbnail-list .thumbnail-item {
+            transform: translateX(calc((var(--index) - var(--center-index)) * (100px + 10px)));
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}" style="margin-left: 110px; font-size: 32px;">GlasgowasteLess</a>
+        <div>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <li class="nav-item me-3">
+                    {% if user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'chat' %}"><i class="bi bi-bell"></i></a>
+                    {% else %}
+                    <a class="nav-link" href="{% url 'login' %}?next={% url 'chat' %}"><i class="bi bi-bell"></i></a>
+                    {% endif %}
+                </li>
+                <li class="nav-item">
+                    {% if user.is_authenticated %}
+                    <span class="nav-link">Hello, {{ user.username }}!</span>
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    {% else %}
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    {% endif %}
+                </li>
+                <li class="nav-item">
+                    {% if user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'account' %}"><i class="bi bi-person-circle fs-4"></i></a>
+                    {% else %}
+                    <a class="nav-link" href="{% url 'login' %}?next={% url 'account' %}"><i
+                            class="bi bi-person-circle fs-4"></i></a>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container d-lg-none mt-3">
+    <form>
+        <div class="input-group">
+            <input class="form-control" type="search" placeholder="Search items..." aria-label="Search">
+            <button class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+</div>
+
+<main class="container mt-4">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div id="productCarousel" class="carousel slide bg-white p-3 rounded shadow-sm">
+                <div class="carousel-inner ratio ratio-1x1">
+                    <div class="carousel-item active">
+                        <img id="product-image-0" src="https://via.placeholder.com/800x600?text=Loading..."
+                             class="d-block" alt="Product image">
+                        <div class="magnify" id="magnify-0"></div>
+                    </div>
+                    <div class="carousel-item">
+                        <img id="product-image-1" src="https://via.placeholder.com/800x600?text=Image+2..."
+                             class="d-block" alt="Product image 2">
+                        <div class="magnify" id="magnify-1"></div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel"
+                        data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel"
+                        data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="thumbnail-list" id="thumbnail-list"></div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="sticky-aside bg-white rounded shadow-sm">
+                <h2 id="product-price" class="price-tag mb-3">Loading...</h2>
+                <h3 id="product-name" class="mb-3 fw-bold">Loading...</h3>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2"><span class="text-muted">Post time</span><span
+                            id="product-post-time">Loading...</span></div>
+                    <div class="d-flex justify-content-between mb-2"><span class="text-muted">Status</span><span
+                            id="product-status">Loading...</span></div>
+                    <div class="d-flex justify-content-between mb-2"><span
+                            class="text-muted">Available Until</span><span
+                            id="product-available-until">Loading...</span></div>
+                    <div class="d-flex justify-content-between"><span class="text-muted">Location</span><span
+                            id="product-location"><i class="bi bi-geo-alt"></i> Loading...</span></div>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-body d-flex align-items-center">
+                        <a id="seller-link" href="#">
+                            <img id="seller-avatar" src="https://via.placeholder.com/50" class="rounded-circle me-3"
+                                 alt="Seller avatar">
+                        </a>
+
+                        <div><h6 id="seller-username" class="card-title mb-0">Loading...</h6></div>
+                    </div>
+                </div>
+                <div class="d-grid gap-3">
+                    <a id="chatButton" class="btn btn-chat" href="#"><i class="bi bi-chat-dots me-2"></i>Chat Now</a>
+                    <button class="btn btn-like" id="likeButton"><i class="bi bi-heart me-2"></i>Like it</button>
+                    <button class="btn btn-buy" id="buyButton"><i class="bi bi-cart me-2"></i>Buy Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="card shadow-sm detail-info-card">
+            <div class="card-body">
+                <h4 class="card-title">DETAILED INFORMATION</h4>
+                <div class="content-fold"><p id="product-description" class="card-text">Loading...</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/bootstrap.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        let productId = "{{ product_id|default:'0' }}"; // 作为字符串传递，需转换为数字
+        productId = parseInt(productId); // 转换为整数
+        let sellerId = null;
+        let isFavorited = false;
+
+        console.log("Product ID:", productId); // 调试：确认 productId
+
+        function checkFavoriteStatus() {
+            const token = localStorage.getItem("access_token");
+            console.log("Token in checkFavoriteStatus:", token);
+            if (!token) {
+                console.warn("No token found, please log in.");
+                alert("No token found. Please log in to use favorites.");
+                window.location.href = "/login/?next=/detail/" + productId;
+                return;
+            }
+            $.ajax({
+                url: `/favorites/`,
+                type: "GET",
+                headers: {"Authorization": "Bearer " + token},
+                success: function (data) {
+                    const favorites = data.results || [];
+                    isFavorited = favorites.some(item => item.product.id === productId);
+                    updateLikeButton();
+                },
+                error: function (xhr) {
+                    console.error("Failed to check favorite status:", xhr.status, xhr.responseText);
+                    if (xhr.status === 401) {
+                        console.warn("Token invalid or expired. Please log in again.");
+                        alert("Token invalid. Please log in again to use favorites.");
+                        window.location.href = "/login/?next=/detail/" + productId;
+                    } else {
+                        alert("Failed to load favorites. Status: " + xhr.status);
+                    }
+                }
+            });
+        }
+
+        function updateLikeButton() {
+            const icon = $('#likeButton').find('i');
+            if (isFavorited) {
+                $('#likeButton').addClass('active');
+                icon.removeClass('bi-heart').addClass('bi-heart-fill');
+            } else {
+                $('#likeButton').removeClass('active');
+                icon.removeClass('bi-heart-fill').addClass('bi-heart');
+            }
+        }
+
+        function loadProductDetails() {
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+                console.warn("No token found, skipping product details.");
+                alert("Please log in to view product details.");
+                window.location.href = "/login/?next=/detail/" + productId;
+                return;
+            }
+            $.ajax({
+                url: `/api/products/${productId}/`,
+                type: "GET",
+                headers: {"Authorization": "Bearer " + token},
+                success: function (data) {
+                    console.log("Product Data:", JSON.stringify(data, null, 2));
+                    $("#product-name").text(data.name || "No name available");
+                    $("#product-price").text(`£${data.price || "N/A"}`);
+                    $("#product-description").text(data.description || "No description available");
+                    $("#product-location").html(`<i class="bi bi-geo-alt"></i> ${data.location || "Unknown"}`);
+                    $("#product-status").text(data.status || "Unknown");
+                    $("#product-post-time").text(new Date(data.created_at).toLocaleDateString() || "Unknown");
+                    $("#product-available-until").text(data.available_until ? new Date(data.available_until).toLocaleDateString() : "Unknown");
+
+                    const images = data.images || [data.image || "https://via.placeholder.com/800x600?text=Loading..."];
+                    const carouselInner = document.querySelector('.carousel-inner');
+                    const thumbnailList = document.getElementById('thumbnail-list');
+                    carouselInner.innerHTML = '';
+                    thumbnailList.innerHTML = '';
+
+                    images.forEach((imgSrc, index) => {
+                        const isActive = index === 0 ? 'active' : '';
+                        const carouselItem = `<div class="carousel-item ${isActive}"><img id="product-image-${index}" src="${imgSrc}" class="d-block" alt="Product image ${index}"><div class="magnify" id="magnify-${index}"></div></div>`;
+                        carouselInner.innerHTML += carouselItem;
+
+                        const thumbnailItem = `<div class="thumbnail-item" style="--index: ${index}; --total-thumbnails: ${images.length};"><div class="img-thumbnail"><img src="${imgSrc}" alt="Thumbnail ${index}" data-bs-target="#productCarousel" data-bs-slide-to="${index}"></div></div>`;
+                        thumbnailList.innerHTML += thumbnailItem;
+                    });
+
+                    if (token) {
+                        $.ajax({
+                            url: `/api/products/${productId}/seller/`,
+                            type: "GET",
+                            headers: {"Authorization": "Bearer " + token},
+                            success: function (sellerData) {
+                                console.log("Seller Data:", sellerData);
+                                if (sellerData && sellerData.id) {
+                                    $("#seller-username").text(sellerData.username || "Unknown");
+                                    $("#seller-avatar").attr("src", sellerData.avatar || "https://via.placeholder.com/50");
+                                    sellerId = sellerData.id;
+                                    $("#chatButton").attr("href", `/chat/?seller=${sellerId}&product=${productId}`).removeAttr("disabled");
+                                    $("#seller-link").attr("href", `/sellsaccount/?seller_id=${sellerId}`);
+                                    console.log("Chat URL set to:", $("#chatButton").attr("href"));
+                                } else {
+                                    console.warn("No seller data available for chat.");
+                                    $("#chatButton").attr("href", "#").attr("disabled", true);
+                                }
+                            },
+                            error: function (xhr) {
+                                console.error("Failed to load seller data:", xhr.status, xhr.responseText);
+                                $("#chatButton").attr("href", "#").attr("disabled", true);
+                                $("#seller-link").attr("href", "#");
+                            }
+                        });
+                    } else {
+                        console.warn("No token found, skipping seller data request.");
+                        $("#chatButton").attr("href", "#").attr("disabled", true);
+                    }
+
+                    checkFavoriteStatus();
+
+                    images.forEach((_, index) => {
+                        const img = document.getElementById(`product-image-${index}`);
+                        const magnify = document.getElementById(`magnify-${index}`);
+                        img.addEventListener('mousemove', (e) => {
+                            const rect = img.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            const imgWidth = img.offsetWidth;
+                            const imgHeight = img.offsetHeight;
+                            if (x >= 0 && x <= imgWidth && y >= 0 && y <= imgHeight) {
+                                magnify.style.display = 'block';
+                                magnify.style.left = `${e.pageX + 10}px`;
+                                magnify.style.top = `${e.pageY - 75}px`;
+                                const bgX = -(x * 4 - magnify.offsetWidth / 2);
+                                const bgY = -(y * 4 - magnify.offsetHeight / 2);
+                                magnify.style.backgroundImage = `url(${img.src})`;
+                                magnify.style.backgroundPosition = `${bgX}px ${bgY}px`;
+                            }
+                        });
+                        img.addEventListener('mouseleave', () => {
+                            magnify.style.display = 'none';
+                        });
+                    });
+                },
+                error: function (xhr) {
+                    console.error("AJAX Error:", xhr.status, xhr.responseText);
+                    if (xhr.status === 401) {
+                        alert("Session expired. Please log in again.");
+                        window.location.href = "/login/?next=/detail/" + productId;
+                    } else if (xhr.status === 404) {
+                        alert("Product not found. Status: " + xhr.status);
+                    } else {
+                        alert("Failed to load product details. Status: " + xhr.status + "\nDetails: " + xhr.responseText);
+                    }
+                }
+            });
+        }
+
+        // 初始加载
+        loadProductDetails();
+
+        $('#chatButton').click(function (e) {
+            e.preventDefault();
+            const token = localStorage.getItem("access_token");
+            if (!token || !sellerId) {
+                alert("Please log in or ensure seller data is available to start a chat.");
+                return;
+            }
+            window.location.href = `/chat/?seller=${sellerId}&product=${productId}`;
+        });
+
+        $('#likeButton').click(function () {
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+                alert("Please log in to manage favorites.");
+                window.location.href = "/login/?next=/detail/" + productId;
+                return;
+            }
+            if (isFavorited) {
+                $.ajax({
+                    url: `/favorites/`,
+                    type: "GET",
+                    headers: {"Authorization": "Bearer " + token},
+                    success: function (data) {
+                        const favorites = data.results || [];
+                        const favoriteItem = favorites.find(item => item.product.id === productId);
+                        if (favoriteItem) {
+                            $.ajax({
+                                url: `/favorites/${favoriteItem.id}/delete/`,
+                                type: "DELETE",
+                                headers: {"Authorization": "Bearer " + token},
+                                success: function () {
+                                    isFavorited = false;
+                                    updateLikeButton();
+                                    alert("Removed from favorites!");
+                                },
+                                error: function (xhr) {
+                                    console.error("Failed to remove from favorites:", xhr.status, xhr.responseText);
+                                    alert("Failed to remove from favorites. Please log in.");
+                                }
+                            });
+                        }
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: `/favorites/`,
+                    type: "POST",
+                    headers: {"Authorization": "Bearer " + token},
+                    data: {product_id: productId},
+                    success: function () {
+                        isFavorited = true;
+                        updateLikeButton();
+                        alert("Added to favorites!");
+                    },
+                    error: function (xhr) {
+                        console.error("Failed to add to favorites:", xhr.status, xhr.responseText);
+                        alert("Failed to add to favorites. Please log in.");
+                    }
+                });
+            }
+        });
+
+        $('#buyButton').click(function () {
+            const token = localStorage.getItem("access_token");
+            console.log("Token for Buy:", token);
+            if (!token) {
+                alert("No token found. Please log in to proceed with the purchase.");
+                window.location.href = "/login/?next=/detail/" + productId;
+                return;
+            }
+            $.ajax({
+                url: `/api/transactions/`,
+                type: "POST",
+                headers: {"Authorization": "Bearer " + token},
+                data: {product_id: productId},
+                success: function (response) {
+                    console.log("Transaction Response:", response);
+                    const transactionId = response.id;
+                    window.location.href = `/transactions/?transaction_id=${transactionId}&product_id=${productId}`;
+                },
+                error: function (xhr) {
+                    console.error("Failed to create transaction:", xhr.status, xhr.responseText);
+                    if (xhr.status === 401) {
+                        alert("Token invalid. Please log in again to proceed with the purchase.");
+                        window.location.href = "/login/?next=/detail/" + productId;
+                    } else {
+                        alert("Failed to create transaction. Status: " + xhr.status + "\nDetails: " + xhr.responseText);
+                    }
+                }
+            });
+        });
+    });
+</script>
+<script>(function () {
+    function c() {
+        var b = a.contentDocument || a.contentWindow.document;
+        if (b) {
+            var d = b.createElement('script');
+            d.innerHTML = "window.__CF$cv$params={r:'922758d70a524552',t:'MTc0MjMyODM0OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName('head')[0].appendChild(d)
+        }
+    }
+
+    if (document.body) {
+        var a = document.createElement('iframe');
+        a.height = 1;
+        a.width = 1;
+        a.style.position = 'absolute';
+        a.style.top = 0;
+        a.style.left = 0;
+        a.style.border = 'none';
+        a.style.visibility = 'hidden';
+        document.body.appendChild(a);
+        if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else {
+            var e = document.onreadystatechange || function () {
+            };
+            document.onreadystatechange = function (b) {
+                e(b);
+                'loading' !== document.readyState && (document.onreadystatechange = e, c())
+            }
+        }
+    }
+})();
+
+
+</script>
+</body>
+</html>

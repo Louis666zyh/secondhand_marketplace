@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GlasgowasteLess - Seller's Account</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --navy-blue: #002147; /* 藏蓝色 */
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        nav.navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary {
+            background-color: var(--navy-blue) !important;
+            border-color: var(--navy-blue) !important;
+        }
+
+        .btn-primary:hover {
+            background-color: #001f3f !important;
+            border-color: #001f3f !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--navy-blue) !important;
+            border-color: var(--navy-blue) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--navy-blue) !important;
+            color: #fff !important;
+            border-color: var(--navy-blue) !important;
+        }
+
+        .text-primary {
+            color: var(--navy-blue) !important;
+        }
+
+        header.profile-header {
+            background: #fff;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        header.profile-header img {
+            width: 120px;
+            height: 120px;
+        }
+
+        header.profile-header h2 {
+            font-size: 1.75rem;
+        }
+
+        .profile-stats .col {
+            border-right: 1px solid #dee2e6;
+        }
+
+        .profile-stats .col:last-child {
+            border-right: none;
+        }
+
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        .comment-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .nav-tabs .nav-link {
+            font-weight: 500;
+            color: var(--navy-blue) !important;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}"style="margin-left: 110px; font-size: 32px;">GlasgowasteLess</a>
+        <div>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'chat' %}"><i class="bi bi-chat-dots fs-4"></i></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 卖家信息区 -->
+<header class="profile-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <img id="seller-avatar" src="https://placekitten.com/120/120" class="rounded-circle" alt="Seller Avatar">
+            </div>
+            <div class="col">
+                <h2 class="mb-0" id="seller-username">
+                    Loading...
+                </h2>
+                <div class="mt-2" id="seller-location"><i class="bi bi-geo-alt me-1"></i> Loading...</div>
+            </div>
+        </div>
+        <!-- 数据概览 -->
+        <div class="row mt-4 text-center profile-stats">
+            <div class="col-md-3">
+                <div class="text-muted small">Transactions</div>
+                <div class="h4 fw-bold" id="seller-transactions">0</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted small">Followers</div>
+                <div class="h4 fw-bold" id="seller-followers">0</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted small">Items for Sale</div>
+                <div class="h4 fw-bold" id="seller-items-for-sale">0</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted small">Return Rate</div>
+                <div class="h4 fw-bold" id="seller-return-rate">0%</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- 主体内容 -->
+<main class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#selling">
+                    <i class="bi bi-box-seam me-2"></i> Items for Sale (<span id="items-count">0</span>)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#reviews">
+                    <i class="bi bi-chat-square-text me-2"></i> Buyer Reviews (<span id="reviews-count">0</span>)
+                </a>
+            </li>
+        </ul>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" id="follow-seller-btn">Follow Seller</button>
+            <a class="btn btn-primary" id="message-seller-btn" href="#">Message Seller</a>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <!-- 在售商品 -->
+        <div class="tab-pane fade show active" id="selling">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="items-list">
+                <!-- 商品卡片将动态添加 -->
+            </div>
+        </div>
+
+        <!-- 买家评价 -->
+        <div class="tab-pane fade" id="reviews">
+            <div class="row g-4" id="reviews-list">
+                <!-- 评价卡片将动态添加 -->
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function getParameterByName(name, url) {
+  if (!url) url = window.location.href;
+  name = name.replace(/[\[\]]/g, '\\$&');
+  var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+      results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+function getToken() {
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    console.warn("No token found in localStorage. Please log in.");
+    alert("请登录以查看卖家信息。");
+    window.location.href = "/login/?next=/sellsaccount/?seller_id=" + getParameterByName('seller_id');
+    return null;
+  }
+  return token;
+}
+
+$(document).ready(function () {
+  const sellerId = getParameterByName('seller_id');
+  if (!sellerId) {
+    alert("未提供卖家ID。");
+    window.location.href = "/home/";
+    return;
+  }
+
+  const token = getToken();
+  if (!token) return;
+
+  let firstProductId = null;
+
+  // 加载卖家信息
+  $.ajax({
+    url: `/api/users/${sellerId}/`,
+    type: "GET",
+    headers: {"Authorization": "Bearer " + token},
+    success: function (sellerData) {
+      console.log("Seller data from /api/users/: ", JSON.stringify(sellerData, null, 2));
+      if (!sellerData || !sellerData.id || !sellerData.username) {
+        console.error("Invalid seller data: ", JSON.stringify(sellerData, null, 2));
+        alert("无法加载卖家信息：数据不完整。");
+        $("#message-seller-btn").attr("href", "/chat/");
+        return;
+      }
+      $("#seller-username").text(sellerData.username || "未知");
+      $("#seller-avatar").attr("src", sellerData.avatar || "https://placekitten.com/120/120");
+      $("#seller-location").html(`<i class="bi bi-geo-alt me-1"></i> ${sellerData.location || "未知"}`);
+      $("#seller-transactions").text(sellerData.transactions || 0);
+      $("#seller-followers").text(sellerData.followers || 0);
+      $("#seller-items-for-sale").text(sellerData.items_for_sale || 0);
+
+      // 计算退货率
+      $.ajax({
+        url: `/api/transactions/?seller=${sellerId}`,
+        type: "GET",
+        headers: {"Authorization": "Bearer " + token},
+        success: function (transactions) {
+          const total = transactions.length;
+          const returns = transactions.filter(t => t.return_status === 'approved').length;
+          const returnRate = total > 0 ? ((returns / total) * 100).toFixed(2) : 0;
+          $("#seller-return-rate").text(`${returnRate}%`);
+        },
+        error: function (xhr) {
+          console.error("Failed to load transactions for return rate:", xhr.status, xhr.responseText);
+          $("#seller-return-rate").text("0%");
+        }
+      });
+    },
+    error: function (xhr) {
+      console.error("Failed to load seller data:", xhr.status, xhr.responseText);
+      alert("无法加载卖家信息。");
+      $("#message-seller-btn").attr("href", "/chat/");
+    }
+  });
+
+  // 加载卖家的在售商品
+  $.ajax({
+    url: `/api/products/?seller=${sellerId}`,
+    type: "GET",
+    headers: {"Authorization": "Bearer " + token},
+    success: function (data) {
+      console.log("Products data from /api/products/?seller: ", JSON.stringify(data, null, 2));
+      const itemsList = $("#items-list");
+      itemsList.empty();
+      let products = Array.isArray(data) ? data : (data.results || []);
+      if (!Array.isArray(products)) {
+        console.error("Products data is not an array:", JSON.stringify(data, null, 2));
+        let errorMessage = "无法加载商品。";
+        if (data && data.error) {
+          errorMessage = `无法加载商品：${data.error}`;
+        } else if (data && !data.results) {
+          errorMessage = "无法加载商品：数据格式异常。";
+        }
+        itemsList.append(`<p class="text-muted">${errorMessage}</p>`);
+        $("#items-count").text(0);
+        $("#seller-items-for-sale").text(0);
+        const redirectUrl = `/chat/?seller=${sellerId}`;
+        $("#message-seller-btn").attr("href", redirectUrl);
+        return;
+      }
+      $("#items-count").text(products.length || 0);
+      $("#seller-items-for-sale").text(products.length || 0);
+      if (products.length === 0) {
+        itemsList.append('<p class="text-muted">暂无在售商品。</p>');
+        const redirectUrl = `/chat/?seller=${sellerId}`;
+        $("#message-seller-btn").attr("href", redirectUrl);
+        return;
+      }
+      firstProductId = products[0].id;
+      if (!firstProductId) {
+        console.error("First product ID is undefined:", JSON.stringify(products[0], null, 2));
+        const redirectUrl = `/chat/?seller=${sellerId}`;
+        $("#message-seller-btn").attr("href", redirectUrl);
+        itemsList.append('<p class="text-muted">无法加载商品：商品数据无效。</p>');
+        return;
+      }
+      const redirectUrl = `/chat/?seller=${sellerId}&product=${firstProductId}`;
+      $("#message-seller-btn").attr("href", redirectUrl);
+      products.forEach(product => {
+        if (!product.id) {
+          console.error("Product ID is undefined for product:", JSON.stringify(product, null, 2));
+        }
+        const viewMoreUrl = product.id ? `/detail/${product.id}/` : '#';
+        const viewMoreButton = product.id
+          ? `<a class="btn btn-sm btn-primary view-more-btn" href="${viewMoreUrl}" data-product-id="${product.id}">查看详情</a>`
+          : `<button class="btn btn-sm btn-primary" disabled>查看详情 (无效ID)</button>`;
+        const itemHtml = `
+          <div class="col">
+            <div class="card h-100">
+              <img src="${product.image || 'https://placekitten.com/400/300'}" class="card-img-top" alt="商品图片">
+              <div class="card-body">
+                <h5 class="card-title">${product.name || '无名称'}</h5>
+                <p class="card-text mb-1">
+                  <span class="text-danger fw-bold fs-5">£${product.price || 'N/A'}</span>
+                </p>
+                <p class="card-text text-muted small">${product.description || '无描述'}</p>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div class="text-primary small">
+                    <i class="bi bi-eye me-1"></i>${product.views || 0}
+                    <i class="bi bi-heart ms-3 me-1"></i>${product.likes || 0}
+                  </div>
+                  ${viewMoreButton}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        itemsList.append(itemHtml);
+      });
+
+      $(document).on('click', '.view-more-btn', function (e) {
+        const productId = $(this).data('product-id');
+        const href = $(this).attr('href');
+        console.log(`View More clicked for product ID: ${productId}, redirecting to: ${href}`);
+      });
+    },
+    error: function (xhr) {
+      console.error("Failed to load seller products:", xhr.status, xhr.responseText);
+      const itemsList = $("#items-list");
+      itemsList.empty();
+      let errorMessage = `无法加载商品：${xhr.status} - ${xhr.responseText || '未知错误'}`;
+      itemsList.append(`<p class="text-muted">${errorMessage}</p>`);
+      $("#items-count").text(0);
+      $("#seller-items-for-sale").text(0);
+      const redirectUrl = `/chat/?seller=${sellerId}`;
+      $("#message-seller-btn").attr("href", redirectUrl);
+    }
+  });
+
+  // 加载卖家的买家评价
+  $.ajax({
+    url: `/api/reviews/?seller=${sellerId}`,
+    type: "GET",
+    headers: {"Authorization": "Bearer " + token},
+    success: function (data) {
+      console.log("Reviews data from /api/reviews/?seller: ", JSON.stringify(data, null, 2));
+      const reviewsList = $("#reviews-list");
+      reviewsList.empty();
+      let reviews = Array.isArray(data) ? data : (data.results || []);
+      if (!Array.isArray(reviews)) {
+        console.error("Reviews data is not an array:", JSON.stringify(data, null, 2));
+        let errorMessage = "无法加载评价。";
+        if (data && data.error) {
+          errorMessage = `无法加载评价：${data.error}`;
+        } else if (data && !data.results) {
+          errorMessage = "无法加载评价：数据格式异常。";
+        }
+        reviewsList.append(`<p class="text-muted">${errorMessage}</p>`);
+        $("#reviews-count").text(0);
+        return;
+      }
+      $("#reviews-count").text(reviews.length || 0);
+      if (reviews.length === 0) {
+        reviewsList.append('<p class="text-muted">暂无评价。</p>');
+        return;
+      }
+      reviews.forEach(review => {
+        const reviewHtml = `
+          <div class="col-12">
+            <div class="comment-card">
+              <div class="d-flex align-items-center mb-3">
+                <img src="${review.buyer_avatar || 'https://placekitten.com/45/45'}" class="rounded-circle me-3" alt="买家头像">
+                <div>
+                  <h6 class="mb-0">${review.buyer_username || '匿名'}</h6>
+                  <div class="small text-muted"><i class="bi bi-star-fill"></i> ${review.rating || 0} · ${review.created_at ? new Date(review.created_at).toLocaleDateString() : '未知'}</div>
+                </div>
+                <div class="ms-auto">
+                  <button class="btn btn-link text-muted">
+                    <i class="bi bi-hand-thumbs-up"></i> ${review.likes || 0}
+                  </button>
+                </div>
+              </div>
+              <p class="mb-2">${review.comment || '无评论'}</p>
+              <div class="d-flex gap-2">
+                ${(review.images || []).map(img => `
+                  <img src="${img.image}" class="rounded" style="width:60px;height:60px;object-fit:cover;" alt="评价图片">
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        reviewsList.append(reviewHtml);
+      });
+    },
+    error: function (xhr) {
+      console.error("Failed to load seller reviews:", xhr.status, xhr.responseText);
+      const reviewsList = $("#reviews-list");
+      reviewsList.empty();
+      let errorMessage = `无法加载评价：${xhr.status} - ${xhr.responseText || '未知错误'}`;
+      reviewsList.append(`<p class="text-muted">${errorMessage}</p>`);
+      $("#reviews-count").text(0);
+    }
+  });
+
+  // 关注卖家功能
+  $("#follow-seller-btn").click(function () {
+    $.ajax({
+      url: `/api/follow/${sellerId}/`,
+      type: "POST",
+      headers: {"Authorization": "Bearer " + token},
+      success: function (response) {
+        if (response.followed) {
+          $("#follow-seller-btn").text("取消关注");
+          $("#seller-followers").text(parseInt($("#seller-followers").text()) + 1);
+        } else {
+          $("#follow-seller-btn").text("关注卖家");
+          $("#seller-followers").text(parseInt($("#seller-followers").text()) - 1);
+        }
+      },
+      error: function (xhr) {
+        console.error("Failed to follow/unfollow seller:", xhr.status, xhr.responseText);
+        alert("无法关注/取消关注卖家。");
+      }
+    });
+  });
+
+  // 检查是否已关注
+  $.ajax({
+    url: `/api/follow/${sellerId}/`,
+    type: "GET",
+    headers: {"Authorization": "Bearer " + token},
+    success: function (response) {
+      if (response.followed) {
+        $("#follow-seller-btn").text("取消关注");
+      } else {
+        $("#follow-seller-btn").text("关注卖家");
+      }
+    },
+    error: function (xhr) {
+      console.error("Failed to check follow status:", xhr.status, xhr.responseText);
+    }
+  });
+});
+</script>
+</body>
+</html>

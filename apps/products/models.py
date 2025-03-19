@@ -41,6 +41,8 @@ class Product(models.Model):
     image = models.ImageField(upload_to="product_images/", null=True, blank=True, help_text="Product image")
     available_until = models.DateField(null=True, blank=True, help_text="Date until which the product is available.")
     location = models.CharField(max_length=255, blank=True, null=True, help_text="Location of the product.")
+    views = models.PositiveIntegerField(default=0, help_text="Number of views for the product.")  # 新增字段
+    likes = models.PositiveIntegerField(default=0, help_text="Number of likes for the product.")  # 新增字段
 
     def __str__(self):
         return f"{self.name} - {self.status}"

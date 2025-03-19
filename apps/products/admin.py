@@ -7,14 +7,14 @@ from .models import Product
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
     'name', 'price', 'status', 'category', 'seller', 'created_at', 'available_until', 'is_approved', 'preview_image',
-    'delete_button')
+    'delete_button', 'location')
     list_filter = ('status', 'category', 'is_approved', 'available_until')
     search_fields = ('name', 'description')
     actions = [ 'delete_selected_products' ]
-    list_editable = ('price', 'status', 'available_until', 'is_approved', 'category')
+    list_editable = ('price', 'status', 'available_until', 'is_approved', 'category', 'location')
     fieldsets = (
         (None, {'fields': (
-        'name', 'description', 'price', 'category', 'status', 'available_until', 'is_approved', 'image', 'seller')}),
+        'name', 'description', 'price', 'category', 'status', 'available_until', 'is_approved', 'image', 'seller', 'location')}),
     )
 
     def preview_image(self, obj):

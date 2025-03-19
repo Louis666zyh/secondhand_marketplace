@@ -1,13 +1,12 @@
 from rest_framework import serializers
-from .models import Message
+from apps.chat.models import Message  # 修正导入
 
 class MessageSerializer(serializers.ModelSerializer):
-    """Serializer for Chat Messages"""
-    sender = serializers.ReadOnlyField(source="sender.username")  # Read-only sender username
-    receiver = serializers.ReadOnlyField(source="receiver.username")  # Read-only receiver username
-    product_image = serializers.ImageField(source="product.image", read_only=True)
+    sender_username = serializers.CharField(source='sender.username', read_only=True)
+    receiver_username = serializers.CharField(source='receiver.username', read_only=True)
+    product_image = serializers.ImageField(source='product.image', read_only=True, required=False)
 
     class Meta:
         model = Message
-        fields = ["id", "sender", "receiver", "content", "created_at", "product_image"]
-        extra_kwargs = {"sender": {"read_only": True}}  # Ensure sender is auto-filled
+        fields = ["id", "sender", "receiver", "sender_username", "receiver_username", "content", "created_at", "product_image"]
+        extra_kwargs = {"sender": {"read_only": True}, "receiver": {"read_only": True}}

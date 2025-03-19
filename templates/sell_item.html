@@ -11,8 +11,8 @@
     <!-- Custom CSS -->
     <style>
         body {
-            background-color: #f8f9fa; /* 与 index.html 一致的背景色 */
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* 统一字体 */
+            background-color: #f8f9fa;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
         .sell-item-container {
             max-width: 800px;
@@ -20,47 +20,89 @@
             padding: 30px;
             background-color: #ffffff;
             border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 与 index.html 卡片阴影一致 */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         .sell-item-header {
             text-align: center;
             margin-bottom: 30px;
-            color: #333; /* 与 index.html 的标题颜色一致 */
-            font-weight: bold; /* 与 index.html 的 fw-bold 一致 */
-            font-size: 24px; /* 调整标题大小 */
+            color: #333;
+            font-weight: bold;
+            font-size: 24px;
         }
         .form-label {
             font-weight: bold;
-            color: #333; /* 与 index.html 的文本颜色一致 */
-            font-size: 14px; /* 与 index.html 的卡片标题字体大小一致 */
+            color: #333;
+            font-size: 14px;
         }
         .form-control, .form-select {
             border-radius: 5px;
-            transition: box-shadow 0.2s ease; /* 添加悬浮效果 */
+            transition: box-shadow 0.2s ease;
         }
         .form-control:focus, .form-select:focus {
-            box-shadow: 0 0 5px rgba(255, 80, 0, 0.3); /* 橙色聚焦效果 */
-            border-color: #ff5000; /* 与 index.html 的橙色一致 */
+            box-shadow: 0 0 5px rgba(255, 80, 0, 0.3);
+            border-color: #ff5000;
         }
         .btn-submit {
             width: 100%;
             padding: 10px;
             font-size: 18px;
-            background-color: #000000; /* 橙色按钮，与 index.html 的价格颜色一致 */
+            background-color: #000000;
             border: none;
             transition: background-color 0.2s ease;
             color: #ffffff;
         }
         .btn-submit:hover {
-            background-color: #e64500; /* 橙色按钮的悬浮效果 */
+            background-color: #e64500;
         }
         .invalid-feedback {
-            font-size: 12px; /* 与 index.html 的小字体一致 */
-            color: #dc3545; /* Bootstrap 默认的红色错误提示 */
+            font-size: 12px;
+            color: #dc3545;
         }
     </style>
 </head>
 <body>
+    <!-- 导航栏，从 index.html 迁移 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}"style="margin-left: 110px; font-size: 32px;">GlasgowasteLess</a>
+            <div>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item me-3">
+                        {% if user.is_authenticated %}
+                        <a class="nav-link" href="{% url 'chat' %}">
+                            <i class="bi bi-bell"></i>
+                        </a>
+                        {% else %}
+                        <a class="nav-link" href="{% url 'login' %}?next={% url 'chat' %}">
+                            <i class="bi bi-bell"></i>
+                        </a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        {% if user.is_authenticated %}
+                        <span class="nav-link">Hello, {{ user.username }}!</span>
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        {% else %}
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        {% if user.is_authenticated %}
+                        <a class="nav-link" href="{% url 'account' %}">
+                            <i class="bi bi-person-circle fs-4"></i>
+                        </a>
+                        {% else %}
+                        <a class="nav-link" href="{% url 'login' %}?next={% url 'account' %}">
+                            <i class="bi bi-person-circle fs-4"></i>
+                        </a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 表单部分 -->
     <div class="container sell-item-container">
         <h2 class="sell-item-header">Upload Your Item</h2>
         <form id="sellItemForm" enctype="multipart/form-data">
@@ -126,7 +168,24 @@
     <!-- Custom JS -->
     <script>
         $(document).ready(function () {
-            // 客户端验证
+            // 获取 CSRF 令牌
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            const csrftoken = getCookie('csrftoken');
+
+            // 提交表单
             $("#sellItemForm").on("submit", function (event) {
                 let form = this;
                 if (!form.checkValidity()) {
@@ -135,23 +194,34 @@
                 }
                 $(form).addClass("was-validated");
 
-                // 如果表单验证通过，继续 AJAX 提交
                 if (form.checkValidity()) {
-                    event.preventDefault(); // 防止默认表单提交
+                    event.preventDefault();
                     let formData = new FormData(this);
+                    let token = localStorage.getItem('access_token');
+
+                    if (!token) {
+                        alert("Please log in to upload an item.");
+                        window.location.href = "/login/?next=/sell-item/";
+                        return;
+                    }
 
                     $.ajax({
-                        url: "/api/products/", // Backend API endpoint
+                        url: "/api/products/",
                         type: "POST",
                         data: formData,
                         processData: false,
                         contentType: false,
+                        headers: {
+                            "Authorization": "Bearer " + token,
+                            "X-CSRFToken": csrftoken
+                        },
                         success: function (data) {
                             alert("Item uploaded successfully!");
-                            window.location.href = "/"; // 重定向到首页
+                            window.location.href = "/";
                         },
                         error: function (xhr) {
-                            alert("Upload failed, please check the form and try again.");
+                            let errorMessage = xhr.responseJSON ? xhr.responseJSON.detail || xhr.responseJSON.error || "Upload failed, please try again." : "Upload failed, please try again.";
+                            alert(errorMessage);
                             console.log("Error:", xhr.status, xhr.responseText);
                         }
                     });
