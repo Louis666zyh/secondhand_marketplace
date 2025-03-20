@@ -5,7 +5,6 @@ __pycache__/
 *.pyd
 *.db
 db.sqlite3
-media/
 
 # IDE 相关
 .idea/
