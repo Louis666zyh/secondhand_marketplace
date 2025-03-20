@@ -53,11 +53,10 @@
 <!-- Navigation (已与 index.html 结构一致) -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
     <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="{% url 'home' %}"style="margin-left: 110px; font-size: 32px;">GlasgowasteLess</a>
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}" style="margin-left: 110px; font-size: 32px;">GlasgowasteLess</a>
         <form class="d-none d-lg-flex search-container">
             <div class="input-group">
-                <input class="form-control search-input" type="search" placeholder="Search items..."
-                       aria-label="Search">
+                <input class="form-control search-input" type="search" placeholder="Search items..." aria-label="Search">
                 <button class="btn btn-outline-secondary search-button" type="button">
                     <i class="bi bi-search"></i>
                 </button>
@@ -104,7 +103,7 @@
 <div class="confirmation-container">
     <h2>Transaction Confirmation</h2>
     <p id="confirmation-message"></p>
-    <p><strong>Order Serial:</strong> <span id="order-serial"></span></p>
+    <p><strong>Transaction Reference:</strong> <span id="transaction-reference"></span></p>
     <div class="d-grid gap-2 mt-4">
         <button class="btn btn-primary btn-lg" id="backToHomeBtn">
             <i class="bi bi-house me-2"></i> Back to Home
@@ -116,18 +115,17 @@
 <script>
     $(document).ready(function () {
         const urlParams = new URLSearchParams(window.location.search);
-        const orderSerial = urlParams.get('order_serial');
+        const transactionReference = urlParams.get('transaction_reference');
         const transactionId = urlParams.get('transaction_id');
         const productId = urlParams.get('product_id');
 
         $('#confirmation-message').text(`Thank you for your order. You need to contact the seller face-to-face. Please do not use any chat software other than the platform to avoid being deceived!`);
-        $('#order-serial').text(orderSerial);
+        $('#transaction-reference').text(transactionReference);
 
         $('#backToHomeBtn').click(function () {
             window.location.href = '/';
         });
     });
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'922899550d45672f',t:'MTc0MjM0MTQ3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

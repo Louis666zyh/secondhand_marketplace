@@ -65,6 +65,10 @@ class ProductListView(generics.ListCreateAPIView):
         if location:
             queryset = queryset.filter(location__iexact=location)
 
+        # 排除当前用户的商品（仅在未指定 seller 参数时应用）
+        if not seller and self.request.user.is_authenticated:
+            queryset = queryset.exclude(seller=self.request.user)
+
         print(f"Queryset count: {queryset.count()}")
         return queryset
 
@@ -103,7 +107,6 @@ def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk, is_approved=True)
     return render(request, 'detail.html', {'product_id': pk})
 
-
 def search_view(request):
     query = request.GET.get('q', '')
     # 使用 Product 模型，并确保只搜索可用商品
@@ -116,12 +119,12 @@ def search_view(request):
     # 处理 image 字段，确保返回 URL
     results = [
         {
-            'id': item[ 'id' ],
-            'name': item[ 'name' ],
-            'price': float(item[ 'price' ]),  # Decimal 转换为 float
-            'image': item[ 'image' ] if item[ 'image' ] else '',  # 确保 image 字段不为空
-            'available_until': item[ 'available_until' ].isoformat() if item[ 'available_until' ] else '',
-            'location': item[ 'location' ] if item[ 'location' ] else 'Unknown'
+            'id': item['id'],
+            'name': item['name'],
+            'price': float(item['price']),  # Decimal 转换为 float
+            'image': item['image'] if item['image'] else '',  # 确保 image 字段不为空
+            'available_until': item['available_until'].isoformat() if item['available_until'] else '',
+            'location': item['location'] if item['location'] else 'Unknown'
         }
         for item in results
     ]

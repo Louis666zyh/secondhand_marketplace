@@ -24,7 +24,6 @@ urlpatterns = [
                   path('api/transactions/', include('apps.transactions.urls')),
                   path('api/reviews/', include('apps.reviews.urls')),
                   path('api/cart/', include('apps.cart.urls')),
-                  path('api/admin/', include('apps.admin_panel.urls')),
                   path('detail/<int:pk>/', product_detail, name='product-detail-page'),  # 直接定义在根 URL
                   path('transactions/', transaction_detail, name='transaction-detail'),
                   path('favorites/', include('apps.favorites.urls')),

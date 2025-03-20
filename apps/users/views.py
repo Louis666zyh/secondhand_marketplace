@@ -106,7 +106,6 @@ class RegisterView(APIView):
         return Response({"message": "Registration successful"}, status=status.HTTP_201_CREATED)
 
 
-
 class LoginView(APIView):
     permission_classes = [AllowAny]
 

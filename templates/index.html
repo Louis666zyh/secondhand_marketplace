@@ -12,6 +12,12 @@
     <!-- 自定义 CSS -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <style>
+        /* 全局样式 */
+        body {
+            background-color: #f5f5f5;
+        }
+
+        /* 侧边栏 */
         .sidebar {
             position: fixed;
             top: 56px;
@@ -22,13 +28,16 @@
             padding: 20px;
             border-right: 1px solid #dee2e6;
             overflow-y: auto;
+            margin-top: 40px;
         }
 
+        /* 主内容区域 */
         .main-content {
             margin-left: 250px;
             padding: 20px;
         }
 
+        /* 导航栏搜索框 */
         .navbar .search-container {
             margin-left: 10px;
             padding-left: 0;
@@ -43,29 +52,49 @@
             margin-left: 110px;
         }
 
+        /* 筛选区域 */
         .filter-section {
             margin-bottom: 20px;
         }
 
+        /* 商品卡片 */
         .card {
             width: 230px;
+            height: 350px; /* 固定高度，确保卡片大小一致 */
             margin: 0 auto 20px auto;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+            display: flex;
+            flex-direction: column;
         }
 
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            background-color: #f8f9fa;
         }
 
-        .product-img {
+        /* 卡片中的超链接样式 */
+        .card a {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* 卡片图片 */
+        .product-img,
+        .card-img-top {
             object-fit: contain;
             width: 100%;
             height: 180px;
             transition: transform 0.3s ease;
         }
 
-        .card:hover .product-img {
+        .card:hover .product-img,
+        .card:hover .card-img-top {
             transform: scale(1.05);
         }
 
@@ -84,18 +113,30 @@
             opacity: 1;
         }
 
+        .card .ratio {
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 卡片内容 */
         .card-body {
             padding: 10px;
-            height: auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* 确保内容分布均匀 */
         }
 
         .card-title {
             font-size: 14px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
             overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap; /* 确保文本不换行 */
             color: #333;
+        }
+
+        .card:hover .card-title {
+            color: #ff5000;
         }
 
         .card-text, .mb-0 {
@@ -108,21 +149,24 @@
             color: #ff5000;
         }
 
-        .tag-list {
-            margin: 5px 0;
+        /* 商品网格布局 */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 15px;
+            justify-content: center;
         }
 
-        .tag-text {
-            display: inline-block;
-            padding: 2px 6px;
-            background-color: #ffe4e1;
-            color: #ff5000;
-            font-size: 12px;
-            border-radius: 3px;
+        /* "到底啦" 提示样式 */
+        .end-message {
+            font-size: 14px;
+            color: #9C9C9C;
+            margin: 20px 0;
         }
 
+        /* 右侧信息面板 */
         .right-sidebar {
-            width: 250px;
+            width: 350px;
             border-left: 1px solid #dee2e6;
             padding-left: 0;
             margin-top: 10px;
@@ -164,15 +208,19 @@
 
         .right-sidebar .d-grid .btn {
             width: 350px;
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 16px;
         }
 
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-            gap: 15px;
-            justify-content: center;
+        .right-sidebar .d-grid .btn:hover {
+            background-color: #0056b3;
         }
 
+        /* 响应式设计 */
         @media (max-width: 768px) {
             .sidebar {
                 position: static;
@@ -191,6 +239,12 @@
                 border-left: none;
                 padding-left: 0;
                 margin-top: 20px;
+            }
+
+            .right-sidebar .d-grid .btn {
+                width: 100%;
+                max-width: 350px;
+                margin: 0 auto;
             }
 
             .movable-content {
@@ -216,15 +270,26 @@
                 padding-left: 15px;
                 width: 100%;
             }
-
         }
     </style>
 </head>
 <body>
 
+<!-- 顶部导航栏 -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
     <div class="container-fluid">
+        <!-- 品牌名称 -->
         <a class="navbar-brand fw-bold" href="{% url 'home' %}" style="margin-left: 110px; font-size: 32px;">GlasgowWasteLess</a>
+        <!-- 搜索框（桌面端显示） -->
+        <form class="d-none d-lg-flex mx-auto search-container" style="max-width: 600px;">
+            <div class="input-group">
+                <input class="form-control search-input" type="search" placeholder="Search items..." aria-label="Search">
+                <button class="btn btn-outline-secondary search-button" type="button">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+        <!-- 用户相关链接 -->
         <div>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                 <li class="nav-item me-3">
@@ -246,8 +311,7 @@
                     {% if user.is_authenticated %}
                     <a class="nav-link" href="{% url 'account' %}"><i class="bi bi-person-circle fs-4"></i></a>
                     {% else %}
-                    <a class="nav-link" href="{% url 'login' %}?next={% url 'account' %}"><i
-                            class="bi bi-person-circle fs-4"></i></a>
+                    <a class="nav-link" href="{% url 'login' %}?next={% url 'account' %}"><i class="bi bi-person-circle fs-4"></i></a>
                     {% endif %}
                 </li>
             </ul>
@@ -255,19 +319,12 @@
     </div>
 </nav>
 
-<style>
-    .sidebar {
-        margin-top: 40px; /* 让侧边栏向下移动，避免遮挡标题 */
-    }
-</style>
-
-
 <!-- 移动端搜索框 -->
 <div class="container d-lg-none mt-3">
     <form>
         <div class="input-group">
-            <input class="form-control" type="search" placeholder="Search items..." aria-label="Search">
-            <button class="btn btn-outline-secondary" type="button">
+            <input class="form-control search-input" type="search" placeholder="Search items..." aria-label="Search">
+            <button class="btn btn-outline-secondary search-button" type="button">
                 <i class="bi bi-search"></i>
             </button>
         </div>
@@ -277,26 +334,21 @@
 <!-- 主体内容 -->
 <div class="container-fluid">
     <div class="row">
+        <!-- 左侧：分类列表 -->
         <aside class="sidebar col-md-2">
             <h5 class="mb-3">Categories</h5>
             <ul class="list-unstyled">
-                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark"
-                                    data-category="Electronics"><i class="bi bi-phone"></i> Electronics</a></li>
-                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark"
-                                    data-category="Fashion"><i class="bi bi-person-bounding-box"></i> Fashion</a></li>
-                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark"
-                                    data-category="Furniture"><i class="bi bi-house"></i> Furniture</a></li>
-                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark"
-                                    data-category="Books"><i class="bi bi-book"></i> Books</a></li>
-                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark"
-                                    data-category="Sports"><i class="bi bi-basket2"></i> Sports</a></li>
-                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark"
-                                    data-category="Vehicles"><i class="bi bi-truck"></i> Vehicles</a></li>
-                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark"
-                                    data-category="Music"><i class="bi bi-music-note-beamed"></i> Music</a></li>
+                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark" data-category="Electronics"><i class="bi bi-phone"></i> Electronics</a></li>
+                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark" data-category="Fashion"><i class="bi bi-person-bounding-box"></i> Fashion</a></li>
+                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark" data-category="Furniture"><i class="bi bi-house"></i> Furniture</a></li>
+                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark" data-category="Books"><i class="bi bi-book"></i> Books</a></li>
+                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark" data-category="Sports"><i class="bi bi-basket2"></i> Sports</a></li>
+                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark" data-category="Vehicles"><i class="bi bi-truck"></i> Vehicles</a></li>
+                <li class="mb-2"><a href="#" class="category-filter text-decoration-none text-dark" data-category="Music"><i class="bi bi-music-note-beamed"></i> Music</a></li>
             </ul>
         </aside>
 
+        <!-- 中间：商品列表及筛选 -->
         <main class="main-content col-md-8">
             <div class="filter-section d-flex flex-wrap gap-2 mb-3">
                 <!-- 价格筛选 -->
@@ -334,10 +386,18 @@
             <div class="product-grid" id="product-list">
                 <!-- 商品卡片由 AJAX 动态加载 -->
             </div>
+            <div id="loading-indicator" class="text-center mt-3" style="display: none;">
+                <p>Loading...</p>
+            </div>
+            <div id="end-of-products" class="text-center mt-3" style="display: none;">
+                <p class="end-message">Oh, it's the bottom already!</p>
+            </div>
         </main>
 
+        <!-- 右侧：用户信息、消息等 -->
         <aside class="right-sidebar col-md-2">
             <div class="movable-content">
+                <!-- Sell Item 按钮（确保在顶部） -->
                 <div class="d-grid mb-4">
                     {% if user.is_authenticated %}
                     <a href="{% url 'sell_item' %}" class="btn btn-primary">Sell Item</a>
@@ -345,14 +405,13 @@
                     <a href="{% url 'login' %}?next={% url 'sell_item' %}" class="btn btn-primary">Sell Item</a>
                     {% endif %}
                 </div>
+                <!-- 最近消息 -->
                 <div class="mb-4">
                     <h6 class="fw-bold">Recent Messages</h6>
                     <ul class="list-unstyled" id="contact-list">
                         {% for message in recent_messages %}
-                        <li class="d-flex align-items-center p-2 border-bottom chat-contact"
-                            data-user-id="{{ message.sender.id }}">
-                            <img src="{{ message.sender.avatar.url|default:'https://via.placeholder.com/40' }}"
-                                 class="rounded-circle me-2" width="40" height="40" alt="User Avatar">
+                        <li class="d-flex align-items-center p-2 border-bottom chat-contact" data-user-id="{{ message.sender.id }}">
+                            <img src="{% if message.sender.avatar %}{{ message.sender.avatar.url }}{% else %}https://via.placeholder.com/40{% endif %}" class="rounded-circle me-2" width="40" height="40" alt="User Avatar">
                             <div>
                                 <p class="mb-0 fw-bold">{{ message.sender.username }}</p>
                                 <small class="text-muted">{{ message.content|truncatechars:30 }}</small>
@@ -363,14 +422,12 @@
                         {% endfor %}
                     </ul>
                 </div>
-
+                <!-- 最近活动 -->
                 <div>
                     <h6 class="fw-bold">Recent Activity</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2 activity-item"><i class="bi bi-clock-history me-1"></i> You liked iPhone 13 Pro
-                        </li>
-                        <li class="mb-2 activity-item"><i class="bi bi-clock-history me-1"></i> You viewed Nike Trainers
-                        </li>
+                        <li class="mb-2 activity-item"><i class="bi bi-clock-history me-1"></i> You liked iPhone 13 Pro</li>
+                        <li class="mb-2 activity-item"><i class="bi bi-clock-history me-1"></i> You viewed Nike Trainers</li>
                     </ul>
                 </div>
             </div>
@@ -378,6 +435,7 @@
     </div>
 </div>
 
+<!-- 底部页脚 -->
 <footer class="bg-light border-top py-4 mt-4">
     <div class="container d-flex flex-wrap justify-content-between">
         <div class="mb-3 mb-md-0">
@@ -407,17 +465,15 @@
         <div>
             <h6 class="fw-bold">Follow Us</h6>
             <ul class="list-inline mb-0">
-                <li class="list-inline-item me-2"><a href="#" class="text-muted"><i class="bi bi-facebook fs-4"></i></a>
-                </li>
-                <li class="list-inline-item me-2"><a href="#" class="text-muted"><i class="bi bi-twitter fs-4"></i></a>
-                </li>
-                <li class="list-inline-item me-2"><a href="#" class="text-muted"><i
-                        class="bi bi-instagram fs-4"></i></a></li>
+                <li class="list-inline-item me-2"><a href="#" class="text-muted"><i class="bi bi-facebook fs-4"></i></a></li>
+                <li class="list-inline-item me-2"><a href="#" class="text-muted"><i class="bi bi-twitter fs-4"></i></a></li>
+                <li class="list-inline-item me-2"><a href="#" class="text-muted"><i class="bi bi-instagram fs-4"></i></a></li>
             </ul>
         </div>
     </div>
 </footer>
 
+<!-- JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -426,25 +482,36 @@
             category: null,
             ordering: null,
             location: null,
-            available_until__lte: null
+            available_until__lte: null,
+            search: null
         };
         let lastMessageTime = 0;
+        let currentPage = 1;
+        let isLoading = false;
 
-        function loadProducts() {
+        function loadProducts(page = 1) {
+            if (isLoading) return;
+            isLoading = true;
+            $("#loading-indicator").show();
+
             $.ajax({
                 url: "/api/products/",
                 type: "GET",
-                data: {...filterParams, limit: 22},
+                data: { ...filterParams, page: page, limit: 22 },
                 success: function (data) {
                     let productList = $("#product-list");
-                    productList.empty();
+                    if (page === 1) productList.empty();
                     let products = data.results || [];
                     if (!Array.isArray(products)) {
                         productList.append('<p class="text-center">Failed to load products.</p>');
+                        isLoading = false;
+                        $("#loading-indicator").hide();
                         return;
                     }
                     if (products.length === 0) {
-                        productList.append('<p class="text-center">No products available.</p>');
+                        if (page === 1) productList.append('<p class="text-center">No products available.</p>');
+                        isLoading = false;
+                        $("#loading-indicator").hide();
                         return;
                     }
                     products.forEach(function (item) {
@@ -458,10 +525,10 @@
                                             <div class="img-mask"></div>
                                         </div>
                                         <div class="card-body">
-                                            <h5 class="card-title">${item.name}</h5>
+                                            <h5 class="card-title text-truncate">${item.name}</h5>
                                             <p class="card-text text-muted mb-1">Available until: ${item.available_until}</p>
                                             <p class="fw-bold">£${item.price}</p>
-                                            <p class="mb-0"><i class="bi bi-geo-alt"></i> ${item.location || 'Unknown'}</p>
+                                            <p class="mb-0 text-muted"><i class="bi bi-geo-alt"></i> ${item.location || 'Unknown'}</p>
                                         </div>
                                     </a>
                                 </div>
@@ -469,10 +536,21 @@
                         `;
                         productList.append(productHTML);
                     });
+                    currentPage = page;
+                    isLoading = false;
+                    $("#loading-indicator").hide();
+
+                    if (!data.next) {
+                        $(window).off('scroll');
+                        $("#end-of-products").show();
+                    }
                 },
                 error: function (xhr) {
                     console.error("AJAX Error:", xhr.status, xhr.responseText);
-                    alert("Failed to load products.");
+                    isLoading = false;
+                    $("#loading-indicator").hide();
+                    $(window).off('scroll');
+                    $("#product-list").append('<p class="text-center text-muted mt-3">Failed to load more products.</p>');
                 }
             });
         }
@@ -544,7 +622,7 @@
         // 初始加载
         loadProducts();
 
-// 无限滚动
+        // 无限滚动
         $(window).scroll(function () {
             if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
                 loadProducts(currentPage + 1);
@@ -595,10 +673,14 @@
             }
 
             filterParams.search = searchQuery || null;
-            loadProducts();
+            loadProducts(1);
         }
 
-        $(".search-button").click(updateFilters);
+        $(".search-button").click(function (event) {
+            event.preventDefault();
+            updateFilters();
+        });
+
         $(".search-input").keypress(function (event) {
             if (event.which === 13) {
                 event.preventDefault();
@@ -617,35 +699,6 @@
     });
 </script>
 <script src="{% static 'js/bootstrap.js' %}"></script>
-<script>(function () {
-    function c() {
-        var b = a.contentDocument || a.contentWindow.document;
-        if (b) {
-            var d = b.createElement('script');
-            d.innerHTML = "window.__CF$cv$params={r:'922af28b49b1b0d0',t:'MTc0MjM2NjEwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
-            b.getElementsByTagName('head')[0].appendChild(d)
-        }
-    }
-
-    if (document.body) {
-        var a = document.createElement('iframe');
-        a.height = 1;
-        a.width = 1;
-        a.style.position = 'absolute';
-        a.style.top = 0;
-        a.style.left = 0;
-        a.style.border = 'none';
-        a.style.visibility = 'hidden';
-        document.body.appendChild(a);
-        if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else {
-            var e = document.onreadystatechange || function () {
-            };
-            document.onreadystatechange = function (b) {
-                e(b);
-                'loading' !== document.readyState && (document.onreadystatechange = e, c())
-            }
-        }
-    }
-})();</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'923546ff6d6cbd28',t:'MTc0MjQ3NDQxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

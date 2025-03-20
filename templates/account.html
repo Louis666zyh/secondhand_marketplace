@@ -1,1005 +1,1045 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  {% load static %}
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Profile - GlasgowasteLess</title>
-  <style>
-    :root {
-      --theme-blue: #003366;
-      --hover-blue: #002244;
-    }
-    .profile-avatar {
-      width: 150px;
-      height: 150px;
-      cursor: pointer;
-      transition: opacity 0.3s;
-    }
-    .profile-avatar:hover {
-      opacity: 0.8;
-    }
-    .listing-image {
-      height: 200px;
-      object-fit: cover;
-    }
-    .unlike-btn:hover .bi-heart-fill {
-      color: #dc3545;
-      transition: color 0.3s ease;
-    }
-    .empty-state {
-      min-height: 300px;
-    }
-    .card {
-      width: 350px;
-      margin: 0 auto 20px auto;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-    }
-    .product-img {
-      object-fit: contain;
-      width: 100%;
-      height: 180px;
-      transition: transform 0.3s ease;
-    }
-    .card:hover .product-img {
-      transform: scale(1.05);
-    }
-    .img-mask {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.1);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .card:hover .img-mask {
-      opacity: 1;
-    }
-    .card-body {
-      padding: 10px;
-      height: auto;
-    }
-    .card-title {
-      font-size: 14px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      color: #333;
-    }
-    .card-text, .mb-0 {
-      font-size: 12px;
-      color: #9C9C9C;
-    }
-    .fw-bold {
-      font-size: 16px;
-      color: #ff5000;
-    }
-  </style>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Profile - GlasgowasteLess</title>
+    <style>
+        :root {
+            --theme-blue: #003366;
+            --hover-blue: #002244;
+        }
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .profile-avatar:hover {
+            opacity: 0.8;
+        }
+        .listing-image {
+            height: 200px;
+            object-fit: cover;
+        }
+        .unlike-btn:hover .bi-heart-fill {
+            color: #dc3545;
+            transition: color 0.3s ease;
+        }
+        .empty-state {
+            min-height: 300px;
+        }
+        .card {
+            width: 300px;
+            height: 400px;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .product-img {
+            object-fit: contain;
+            width: 100%;
+            height: 180px;
+            transition: transform 0.3s ease;
+        }
+        .card:hover .product-img {
+            transform: scale(1.05);
+        }
+        .img-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .card:hover .img-mask {
+            opacity: 1;
+        }
+        .card-body {
+            padding: 10px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-title {
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #333;
+        }
+        .card-text, .mb-0 {
+            font-size: 12px;
+            color: #9C9C9C;
+        }
+        .fw-bold {
+            font-size: 16px;
+            color: #ff5000;
+        }
+        .product-card a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .product-card a:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
 </head>
 
 <body class="bg-light">
-  <!-- 导航栏 -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-bold" href="{% url 'home' %}"style="margin-left: 110px; font-size: 32px;">GlasgowasteLess</a>
-
-      <div>
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
-          <li class="nav-item me-3">
-            {% if user.is_authenticated %}
-            <a class="nav-link" href="{% url 'chat' %}">
-              <i class="bi bi-bell"></i>
-            </a>
-            {% else %}
-            <a class="nav-link" href="{% url 'login' %}?next={% url 'chat' %}">
-              <i class="bi bi-bell"></i>
-            </a>
-            {% endif %}
-          </li>
-          <li class="nav-item">
-            {% if user.is_authenticated %}
-            <span class="nav-link">Hello, {{ user.username }}!</span>
-            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-            {% else %}
-            <a class="nav-link" href="{% url 'login' %}">Login</a>
-            {% endif %}
-          </li>
-          <li class="nav-item">
-            {% if user.is_authenticated %}
-            <a class="nav-link" href="{% url 'account' %}" onclick="window.location.href=this.href; return false;">
-              <i class="bi bi-person-circle fs-4"></i>
-            </a>
-            {% else %}
-            <a class="nav-link" href="{% url 'login' %}?next={% url 'account' %}">
-              <i class="bi bi-person-circle fs-4"></i>
-            </a>
-            {% endif %}
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container-fluid mt-4">
-    <div class="row g-4">
-      <!-- Left navigation -->
-      <div class="col-lg-3">
-        <div class="card shadow-sm">
-          <div class="card-body text-center position-relative">
-            <!-- Upload avatar -->
-            <form id="avatar-form" method="post" enctype="multipart/form-data" action="{% url 'upload_avatar' %}">
-              {% csrf_token %}
-              <input type="file" name="avatar" id="avatar-input" style="display: none;" accept="image/*">
-              <img src="{% if user.avatar.url %}{{ user.avatar.url }}{% else %}{% static 'img/no-image.png' %}{% endif %}" id="avatar-img" alt="Avatar" class="profile-avatar rounded-circle" onclick="document.getElementById('avatar-input').click()">
-              <div class="text-muted mt-2">Click to upload</div>
-            </form>
-
-            <!-- User Information -->
-            <h4 class="mt-3" id="username">{{ user.username }}</h4>
-            <p class="text-muted" id="userEmail">{{ user.email }}</p>
-            <p class="fst-italic" id="userBio">
-              {% if user_profile %}
-                {{ user_profile.bio|default:"No bio yet" }}
-              {% else %}
-                No bio yet
-              {% endif %}
-            </p>
-            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
-              Edit Profile
-            </button>
-          </div>
-
-          <!-- Navigation Menu -->
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item {% if section == 'selling' %}active{% endif %}" data-section="selling" id="myListingsTab">
-              <i class="bi bi-box-seam me-2"></i>My Listings
-            </li>
-            <li class="list-group-item {% if section == 'likes' %}active{% endif %}" data-section="likes">
-              <i class="bi bi-heart me-2"></i>My Likes ({{ likes_data|length }})
-            </li>
-            <li class="list-group-item {% if section == 'reviews' %}active{% endif %}" data-section="reviews">
-              <i class="bi bi-star me-2"></i>Reviews ({{ user_profile.rating|default:"0.0" }})
-            </li>
-            <li class="list-group-item {% if section == 'orders' %}active{% endif %}" data-section="orders">
-              <i class="bi bi-cart me-2"></i>My Orders
-            </li>
-            <li class="list-group-item {% if section == 'settings' %}active{% endif %}" data-section="settings">
-              <i class="bi bi-gear me-2"></i>Account Settings
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Main content area -->
-      <div class="col-lg-9">
-        <div class="tab-content">
-          <!-- My Listings -->
-          <div class="tab-pane fade {% if section == 'selling' %}show active{% endif %}" id="selling">
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="listingContainer">
-              {% for product in listings_data %}
-                <div class="col">
-                  <div class="card product-card" data-product-id="{{ product.id }}">
-                    <a href="/detail/{{ product.id }}/">
-                      <div class="ratio ratio-1x1">
-                        <img src="{% if product.image %}{{ product.image }}{% else %}{% static 'img/no-image.png' %}{% endif %}" class="card-img-top product-img" alt="{{ product.title }}" loading="lazy">
-                        <div class="img-mask"></div>
-                      </div>
-                      <div class="card-body">
-                        <h5 class="card-title">{{ product.title }}</h5>
-                        <p class="card-text text-muted mb-1">Available until: N/A</p>
-                        <p class="fw-bold">£{{ product.price }}</p>
-                        <p class="mb-0"><i class="bi bi-geo-alt"></i> Unknown</p>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-              {% empty %}
-                <div class="col-12 text-center py-5 empty-state">
-                  <i class="bi bi-heartbreak fs-1 text-muted"></i>
-                  <p class="mt-3">No listings available.</p>
-                </div>
-              {% endfor %}
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}" style="margin-left: 110px; font-size: 32px;">GlasgowasteLess</a>
+            <div>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item me-3">
+                        {% if user.is_authenticated %}
+                        <a class="nav-link" href="{% url 'chat' %}">
+                            <i class="bi bi-bell"></i>
+                        </a>
+                        {% else %}
+                        <a class="nav-link" href="{% url 'login' %}?next={% url 'chat' %}">
+                            <i class="bi bi-bell"></i>
+                        </a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        {% if user.is_authenticated %}
+                        <span class="nav-link">Hello, {{ user.username }}!</span>
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        {% else %}
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        {% if user.is_authenticated %}
+                        <a class="nav-link" href="{% url 'account' %}" onclick="window.location.href=this.href; return false;">
+                            <i class="bi bi-person-circle fs-4"></i>
+                        </a>
+                        {% else %}
+                        <a class="nav-link" href="{% url 'login' %}?next={% url 'account' %}">
+                            <i class="bi bi-person-circle fs-4"></i>
+                        </a>
+                        {% endif %}
+                    </li>
+                </ul>
             </div>
-          </div>
+        </div>
+    </nav>
 
-          <!-- My Likes -->
-          <div class="tab-pane fade {% if section == 'likes' %}show active{% endif %}" id="likes">
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="likesContainer">
-              {% for favorite in likes_data %}
-                <div class="col">
-                  <div class="card product-card" data-product-id="{{ favorite.id }}">
-                    <a href="/detail/{{ favorite.id }}/">
-                      <div class="ratio ratio-1x1">
-                        <img src="{% if favorite.image %}{{ favorite.image }}{% else %}{% static 'img/no-image.png' %}{% endif %}" class="card-img-top product-img" alt="{{ favorite.title }}" loading="lazy">
-                        <div class="img-mask"></div>
-                      </div>
-                      <div class="card-body">
-                        <h5 class="card-title">{{ favorite.title }}</h5>
-                        <p class="card-text text-muted mb-1">Available until: N/A</p>
-                        <p class="fw-bold">£{{ favorite.price }}</p>
-                        <p class="mb-0"><i class="bi bi-geo-alt"></i> Unknown</p>
-                        <div class="d-grid gap-2">
-                          <button class="btn btn-outline-secondary btn-sm unlike-btn" data-id="{{ favorite.id }}">
-                            <i class="bi bi-heart-fill"></i> Unlike
-                          </button>
+    <div class="container-fluid mt-4">
+        <div class="row g-4">
+            <!-- Left navigation -->
+            <div class="col-lg-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center position-relative">
+                        <!-- Upload avatar -->
+                        <form id="avatar-form" method="post" enctype="multipart/form-data" action="{% url 'upload_avatar' %}">
+                            {% csrf_token %}
+                            <input type="file" name="avatar" id="avatar-input" style="display: none;" accept="image/*">
+                            <img src="{% if user.avatar.url %}{{ user.avatar.url }}{% else %}{% static 'img/no-image.png' %}{% endif %}" id="avatar-img" alt="Avatar" class="profile-avatar rounded-circle" onclick="document.getElementById('avatar-input').click()">
+                            <div class="text-muted mt-2">Click to upload</div>
+                        </form>
+
+                        <!-- User Information -->
+                        <h4 class="mt-3" id="username">{{ user.username }}</h4>
+                        <p class="text-muted" id="userEmail">{{ user.email }}</p>
+                        <p class="fst-italic" id="userBio">
+                            {% if user_profile %}
+                                {{ user_profile.bio|default:"No bio yet" }}
+                            {% else %}
+                                No bio yet
+                            {% endif %}
+                        </p>
+                        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
+                            Edit Profile
+                        </button>
+                    </div>
+
+                    <!-- Navigation Menu -->
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item {% if section == 'selling' %}active{% endif %}" data-section="selling" id="myListingsTab">
+                            <i class="bi bi-box-seam me-2"></i>My Listings
+                        </li>
+                        <li class="list-group-item {% if section == 'likes' %}active{% endif %}" data-section="likes">
+                            <i class="bi bi-heart me-2"></i>My Likes ({{ likes_data|length }})
+                        </li>
+                        <li class="list-group-item {% if section == 'reviews' %}active{% endif %}" data-section="reviews">
+                            <i class="bi bi-star me-2"></i>Reviews ({{ user_profile.rating|default:"0.0" }})
+                        </li>
+                        <li class="list-group-item {% if section == 'orders' %}active{% endif %}" data-section="orders">
+                            <i class="bi bi-cart me-2"></i>My Orders
+                        </li>
+                        <li class="list-group-item {% if section == 'settings' %}active{% endif %}" data-section="settings">
+                            <i class="bi bi-gear me-2"></i>Account Settings
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content area -->
+            <div class="col-lg-9">
+                <div class="tab-content">
+                    <!-- My Listings -->
+                    <div class="tab-pane fade {% if section == 'selling' %}show active{% endif %}" id="selling">
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="listingContainer">
+                            {% for product in listings_data %}
+                                <div class="col">
+                                    <div class="card product-card" data-product-id="{{ product.id }}">
+                                        <a href="/detail/{{ product.id }}/">
+                                            <div class="ratio ratio-1x1">
+                                                <img src="{% if product.image %}{{ product.image }}{% else %}{% static 'img/no-image.png' %}{% endif %}" class="card-img-top product-img" alt="{{ product.title }}" loading="lazy">
+                                                <div class="img-mask"></div>
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="card-title text-truncate">{{ product.title }}</h5>
+                                                <p class="card-text text-muted mb-1">Available until: {{ product.available_until|default:"N/A" }}</p>
+                                                <p class="fw-bold">£{{ product.price }}</p>
+                                                <p class="mb-0 text-muted"><i class="bi bi-geo-alt"></i> {{ product.location|default:"Unknown" }}</p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="col-12 text-center py-5 empty-state">
+                                    <i class="bi bi-heartbreak fs-1 text-muted"></i>
+                                    <p class="mt-3">No listings available.</p>
+                                </div>
+                            {% endfor %}
                         </div>
-                      </div>
-                    </a>
-                  </div>
+                    </div>
+
+                    <!-- My Likes -->
+                    <div class="tab-pane fade {% if section == 'likes' %}show active{% endif %}" id="likes">
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="likesContainer">
+                            {% for favorite in likes_data %}
+                                <div class="col">
+                                    <div class="card product-card" data-product-id="{{ favorite.id }}">
+                                        <a href="/detail/{{ favorite.id }}/">
+                                            <div class="ratio ratio-1x1">
+                                                <img src="{% if favorite.image %}{{ favorite.image }}{% else %}{% static 'img/no-image.png' %}{% endif %}" class="card-img-top product-img" alt="{{ favorite.title }}" loading="lazy">
+                                                <div class="img-mask"></div>
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="card-title text-truncate">{{ favorite.title }}</h5>
+                                                <p class="card-text text-muted mb-1">Available until: {{ favorite.available_until|default:"N/A" }}</p>
+                                                <p class="fw-bold">£{{ favorite.price }}</p>
+                                                <p class="mb-0 text-muted"><i class="bi bi-geo-alt"></i> {{ favorite.location|default:"Unknown" }}</p>
+                                                <div class="d-grid gap-2 mt-2">
+                                                    <button class="btn btn-outline-secondary btn-sm unlike-btn" data-id="{{ favorite.id }}">
+                                                        <i class="bi bi-heart-fill"></i> Unlike
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="col-12 text-center py-5 empty-state">
+                                    <i class="bi bi-heartbreak fs-1 text-muted"></i>
+                                    <p class="mt-3">No favorites yet.</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Reviews -->
+                    <div class="tab-pane fade {% if section == 'reviews' %}show active{% endif %}" id="reviews">
+                        <div class="card shadow-sm">
+                            <div class="card-body" id="reviewsContainer">
+                                {% for review in reviews_data %}
+                                    <div class="mb-3">
+                                        <p><strong>{{ review.user }}</strong> rated {{ review.rating }}: {{ review.comment }}</p>
+                                    </div>
+                                {% empty %}
+                                    <p class="text-center">No reviews yet.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Orders -->
+                    <div class="tab-pane fade {% if section == 'orders' %}show active{% endif %}" id="orders">
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="ordersContainer">
+                            <!-- Orders will be loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Account Settings -->
+                    <div class="tab-pane fade {% if section == 'settings' %}show active{% endif %}" id="settings">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Change Password</h5>
+                                <form id="passwordForm" action="{% url 'change_password' %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label">Current Password</label>
+                                        <input type="password" class="form-control" name="old_password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">New Password</label>
+                                        <input type="password" class="form-control" name="new_password" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Password</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              {% empty %}
-                <div class="col-12 text-center py-5 empty-state">
-                  <i class="bi bi-heartbreak fs-1 text-muted"></i>
-                  <p class="mt-3">No favorites yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit data modal box -->
+    <div class="modal fade" id="editModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-              {% endfor %}
-            </div>
-          </div>
-
-          <!-- Reviews -->
-          <div class="tab-pane fade {% if section == 'reviews' %}show active{% endif %}" id="reviews">
-            <div class="card shadow-sm">
-              <div class="card-body" id="reviewsContainer">
-                {% for review in reviews_data %}
-                  <div class="mb-3">
-                    <p><strong>{{ review.user }}</strong> rated {{ review.rating }}: {{ review.comment }}</p>
-                  </div>
-                {% empty %}
-                  <p class="text-center">No reviews yet.</p>
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-
-          <!-- My Orders -->
-          <div class="tab-pane fade {% if section == 'orders' %}show active{% endif %}" id="orders">
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="ordersContainer">
-              <!-- Orders will be loaded dynamically -->
-            </div>
-          </div>
-
-          <!-- Account Settings -->
-          <div class="tab-pane fade {% if section == 'settings' %}show active{% endif %}" id="settings">
-            <div class="card shadow-sm">
-              <div class="card-body">
-                <h5 class="card-title">Change Password</h5>
-                <form id="passwordForm" action="{% url 'change_password' %}" method="post">
-                  {% csrf_token %}
-                  <div class="mb-3">
-                    <label class="form-label">Current Password</label>
-                    <input type="password" class="form-control" name="old_password" required>
-                  </div>
-                  <div class="mb-3">
-                    <label class="form-label">New Password</label>
-                    <input type="password" class="form-control" name="new_password" required>
-                  </div>
-                  <button type="submit" class="btn btn-primary">Update Password</button>
+                <form id="profileForm" action="{% url 'edit_profile' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-control" name="bio" rows="3">{{ user_profile.bio|default:"" }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Avatar</label>
+                            <input type="file" class="form-control" name="avatar" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
                 </form>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Edit data modal box -->
-  <div class="modal fade" id="editModal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Edit Profile</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <form id="profileForm" action="{% url 'edit_profile' %}" method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label">Username</label>
-              <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Bio</label>
-              <textarea class="form-control" name="bio" rows="3">{{ user_profile.bio|default:"" }}</textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Avatar</label>
-              <input type="file" class="form-control" name="avatar" accept="image/*">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Evaluation modal box -->
-  <div class="modal fade" id="reviewModal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Write a Review</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <form id="reviewForm">
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label">Rating (1-5)</label>
-              <input type="number" class="form-control" name="rating" min="1" max="5" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Comment</label>
-              <textarea class="form-control" name="comment" rows="3" required></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Upload Images (Optional)</label>
-              <input type="file" class="form-control" name="images" multiple accept="image/*">
-            </div>
-            <input type="hidden" name="transaction" id="review-transaction-id">
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Submit Review</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add data at the end of <body> -->
-  <script type="application/json" id="listings-data">
-    {{ listings_data|json_script:"listings-data" }}
-  </script>
-  <script type="application/json" id="likes-data">
-    {{ likes_data|json_script:"likes-data" }}
-  </script>
-  <script type="application/json" id="reviews-data">
-    {{ reviews_data|json_script:"reviews-data" }}
-  </script>
-
- <!-- Script -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-$(function() {
-  // Set the global CSRF token
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
-
-  const csrftoken = getCookie('csrftoken');
-
-  $.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-      if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-      }
-    }
-  });
-
-  // Get token
-  function getToken() {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      console.warn("No token found in localStorage. Please log in.");
-      alert("Please log in to view your likes.");
-      window.location.href = "{% url 'login' %}?next={% url 'account' %}";
-      return null;
-    }
-    return token;
-  }
-
-  // Initialize user data
-  let userData = {
-    username: "{{ user.username|escapejs }}",
-    email: "{{ user.email|escapejs }}",
-    bio: "{{ user_profile.bio|default:''|escapejs }}",
-    listings: [],
-    likes: [],
-    reviews: [],
-    orders: []
-  };
-
-  // Get user's listings data
-  function fetchListingsData() {
-    const accessToken = getToken();
-    if (!accessToken) return;
-
-    const userId = {{ user.id }}; // Get the current user's ID from the template
-    console.log("Fetching listings data for user ID:", userId);
-    $.ajax({
-      url: `/api/products/?seller=${userId}`,
-      type: 'GET',
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      success: function(response) {
-        console.log("Listings API response:", response);
-        let listings = Array.isArray(response) ? response : (response.results || []);
-        if (!Array.isArray(listings)) {
-          console.error("Listings data is not an array:", JSON.stringify(response, null, 2));
-          userData.listings = [];
-        } else {
-          userData.listings = listings.map(item => ({
-            id: item.id,
-            title: item.name || '',
-            price: item.price || 0.0,
-            image: item.image || '{% static "img/no-image.png" %}'
-          }));
-        }
-        renderListings(userData.listings);
-        $('[data-section="selling"]').html(`<i class="bi bi-box-seam me-2"></i>My Listings (${userData.listings.length})`);
-      },
-      error: function(xhr) {
-        console.error('Failed to fetch listings data:', xhr.status, xhr.responseText);
-        if (xhr.status === 401) {
-          alert('Please log in to view your items.');
-          window.location.href = "{% url 'login' %}?next={% url 'account' %}";
-        } else {
-          alert('Unable to load product data：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
-          userData.listings = [];
-          renderListings(userData.listings);
-        }
-      }
-    });
-  }
-
-  // Get the latest collection data
-  function fetchLikesData() {
-    const accessToken = getToken();
-    if (!accessToken) return;
-
-    console.log("Fetching likes data with token:", accessToken);
-    $.ajax({
-      url: '{% url "favorite-list" %}',
-      type: 'GET',
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      xhrFields: {
-        withCredentials: true
-      },
-      success: function(response, status, xhr) {
-        console.log("Likes API response:", response);
-        const contentType = xhr.getResponseHeader('Content-Type');
-        if (!contentType || !contentType.includes('application/json')) {
-          console.error('Unexpected response format:', response);
-          alert('Error: The server returned a response in an unexpected format.');
-          return;
-        }
-        userData.likes = response.map(item => ({
-          id: item.product.id,
-          title: item.product.name || '',
-          price: item.product.price || 0.0,
-          image: item.product.image || '{% static "img/no-image.png" %}'
-        }));
-        renderLikes(userData.likes);
-        $('[data-section="likes"]').html(`<i class="bi bi-heart me-2"></i>My Likes (${userData.likes.length})`);
-      },
-      error: function(xhr) {
-        console.error('Failed to fetch likes data:', xhr.status, xhr.responseText);
-        if (xhr.status === 401) {
-          alert('Please log in to view your collection.');
-          window.location.href = "{% url 'login' %}?next={% url 'account' %}";
-        } else {
-          alert('无法加载收藏数据：' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
-        }
-      }
-    });
-  }
-
-  // Get order data
-  function fetchOrdersData() {
-    const accessToken = getToken();
-    if (!accessToken) return;
-
-    console.log("Fetching orders data with token:", accessToken);
-    $.ajax({
-      url: '{% url "transaction-list" %}',
-      type: 'GET',
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      success: function(response) {
-        console.log("Orders Response:", response);
-        userData.orders = response.map(item => ({
-          id: item.id,
-          product: item.product.name,
-          price: item.total_price,
-          status: item.status,
-          delivery_method: item.delivery_method,
-          shipping_address: item.shipping_address,
-          return_status: item.return_status,
-          order_serial: item.order_serial,
-          buyer: item.buyer.username,
-          seller: item.seller.username,
-          is_buyer: item.buyer.id === {{ user.id }},
-          reviewed: item.reviewed || false
-        }));
-        renderOrders(userData.orders);
-      },
-      error: function(xhr) {
-        console.error('Failed to fetch orders:', xhr.status, xhr.responseText);
-        if (xhr.status === 401) {
-          alert('Please log in to view your orders.');
-          window.location.href = "{% url 'login' %}?next={% url 'account' %}";
-        }
-      }
-    });
-  }
-
-  // Get the user's reviews data
-  function fetchReviewsData() {
-    const accessToken = getToken();
-    if (!accessToken) return;
-
-    console.log("Fetching reviews data with token:", accessToken);
-    $.ajax({
-      url: `/api/reviews/?user=${ {{ user.id }} }`,
-      type: 'GET',
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      success: function(response) {
-        console.log("Reviews API response:", response);
-        let reviews = Array.isArray(response) ? response : (response.results || []);
-        if (!Array.isArray(reviews)) {
-          console.error("Reviews data is not an array:", JSON.stringify(response, null, 2));
-          userData.reviews = [];
-        } else {
-          userData.reviews = reviews.map(item => ({
-            user: item.user.username || '匿名',
-            rating: item.rating || 0,
-            comment: item.comment || '无评论'
-          }));
-        }
-        renderReviews(userData.reviews);
-        $('[data-section="reviews"]').html(`<i class="bi bi-chat-square-text me-2"></i>My Reviews (${userData.reviews.length})`);
-      },
-      error: function(xhr) {
-        console.error('Failed to fetch reviews data:', xhr.status, xhr.responseText);
-        if (xhr.status === 401) {
-          alert('Please log in to view your reviews.');
-          window.location.href = "{% url 'login' %}?next={% url 'account' %}";
-        } else {
-          alert('Unable to load review data:' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
-          userData.reviews = [];
-          renderReviews(userData.reviews);
-        }
-      }
-    });
-  }
-
-  // Initialize page
-  function initProfile() {
-    $('#username').text(userData.username);
-    $('#userEmail').text(userData.email);
-    $('#userBio').text(userData.bio || "No bio yet");
-    const section = new URLSearchParams(window.location.search).get('section') || 'selling';
-    $('.list-group-item').removeClass('active');
-    $('.tab-pane').removeClass('show active');
-    $(`[data-section="${section}"]`).addClass('active');
-    $(`#${section}`).addClass('show active');
-    if (section === 'selling') {
-      fetchListingsData();
-    } else if (section === 'likes') {
-      fetchLikesData();
-    } else if (section === 'reviews') {
-      fetchReviewsData();
-    } else if (section === 'orders') {
-      fetchOrdersData();
-    }
-  }
-
-  // Render My Listings
-  function renderListings(listings) {
-    const container = $('#listingContainer');
-    container.empty();
-    if (!listings || listings.length === 0) {
-      container.html(`
-        <div class="col-12 text-center py-5 empty-state">
-          <i class="bi bi-heartbreak fs-1 text-muted"></i>
-          <p class="mt-3">No listings available.</p>
-        </div>
-      `);
-      return;
-    }
-    listings.forEach(item => {
-      const html = `
-        <div class="col">
-          <div class="card product-card" data-product-id="${item.id}">
-            <a href="/detail/${item.id}/">
-              <div class="ratio ratio-1x1">
-                <img src="${item.image || '{% static "img/no-image.png" %}'}" class="card-img-top product-img" alt="${item.title}" loading="lazy">
-                <div class="img-mask"></div>
-              </div>
-              <div class="card-body">
-                <h5 class="card-title">${item.title || ''}</h5>
-                <p class="card-text text-muted mb-1">Available until: N/A</p>
-                <p class="fw-bold">£${item.price || 0.0}</p>
-                <p class="mb-0"><i class="bi bi-geo-alt"></i> Unknown</p>
-              </div>
-            </a>
-          </div>
-        </div>
-      `;
-      container.append(html);
-    });
-  }
-
-  // Render My Likes
-  function renderLikes(likes) {
-    const container = $('#likesContainer');
-    container.empty();
-    if (!likes || likes.length === 0) {
-      container.html(`
-        <div class="col-12 text-center py-5 empty-state">
-          <i class="bi bi-heartbreak fs-1 text-muted"></i>
-          <p class="mt-3">No favorites yet.</p>
-        </div>
-      `);
-      return;
-    }
-    likes.forEach(item => {
-      const html = `
-        <div class="col">
-          <div class="card product-card" data-product-id="${item.id}">
-            <a href="/detail/${item.id}/">
-              <div class="ratio ratio-1x1">
-                <img src="${item.image || '{% static "img/no-image.png" %}'}" class="card-img-top product-img" alt="${item.title}" loading="lazy">
-                <div class="img-mask"></div>
-              </div>
-              <div class="card-body">
-                <h5 class="card-title">${item.title || ''}</h5>
-                <p class="card-text text-muted mb-1">Available until: N/A</p>
-                <p class="fw-bold">£${item.price || 0.0}</p>
-                <p class="mb-0"><i class="bi bi-geo-alt"></i> Unknown</p>
-                <div class="d-grid gap-2">
-                  <button class="btn btn-outline-secondary btn-sm unlike-btn" data-id="${item.id}">
-                    <i class="bi bi-heart-fill"></i> Unlike
-                  </button>
+    <!-- Evaluation modal box -->
+    <div class="modal fade" id="reviewModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Write a Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-              </div>
-            </a>
-          </div>
-        </div>
-      `;
-      container.append(html);
-    });
-  }
-
-  // Render Reviews
-  function renderReviews(reviews) {
-    const container = $('#reviewsContainer');
-    container.empty();
-    if (!reviews || reviews.length === 0) {
-      container.html('<p class="text-center">No reviews yet.</p>');
-      return;
-    }
-    reviews.forEach(review => {
-      container.append(`
-        <div class="mb-3">
-          <p><strong>${review.user || ''}</strong> rated ${review.rating || 0.0}: ${review.comment || ''}</p>
-        </div>
-      `);
-    });
-  }
-
-  // Render My Orders
-  function renderOrders(orders) {
-    const container = $('#ordersContainer');
-    container.empty();
-    if (!orders || orders.length === 0) {
-      container.html(`
-        <div class="col-12 text-center py-5 empty-state">
-          <i class="bi bi-cart fs-1 text-muted"></i>
-          <p class="mt-3">No orders yet.</p>
-        </div>
-      `);
-      return;
-    }
-    orders.forEach(order => {
-      const role = order.is_buyer ? `Seller: ${order.seller}` : `Buyers: ${order.buyer}`;
-      let buyerButtons = '';
-      if (order.is_buyer) {
-        const canReceive = (order.status === 'shipped' || (order.status === 'paid' && order.delivery_method === 'face-to-face')) && order.status !== 'received';
-        const receiveButton = canReceive
-          ? `<button class="btn btn-success btn-sm receive-btn" data-transaction-id="${order.id}">Received</button>`
-          : `<button class="btn btn-success btn-sm" disabled>Received</button>`;
-        const reviewButton = order.status === 'received' && !order.reviewed
-          ? `<button class="btn btn-primary btn-sm review-btn" data-transaction-id="${order.id}">review</button>`
-          : order.status === 'received' && order.reviewed
-            ? `<button class="btn btn-primary btn-sm" disabled>Rated</button>`
-            : '';
-        const returnButton = order.status === 'received' && order.return_status === 'none'
-          ? `<button class="btn btn-warning btn-sm return-btn" data-transaction-id="${order.id}">Request a Return</button>`
-          : '';
-        buyerButtons = `
-          ${receiveButton}
-          ${reviewButton}
-          ${returnButton}
-        `;
-      }
-      let sellerButtons = '';
-      if (!order.is_buyer) {
-        const canShip = order.status === 'paid' && order.status !== 'shipped';
-        const shipButton = canShip
-          ? `<button class="btn btn-success btn-sm ship-btn" data-transaction-id="${order.id}">shipped</button>`
-          : `<button class="btn btn-success btn-sm" disabled>Shipped</button>`;
-        const returnAction = order.return_status === 'requested'
-          ? `
-            <select class="form-select handle-return-btn" data-transaction-id="${order.id}">
-              <option value="">Processing returns</option>
-              <option value="approve">Agree to return</option>
-              <option value="deny">Refuse to return</option>
-            </select>
-          `
-          : '';
-        sellerButtons = `
-          ${shipButton}
-          ${returnAction}
-        `;
-      }
-      const deliveryInfo = order.delivery_method === 'shipping'
-        ? `<p class="mb-0"><i class="bi bi-truck"></i> shiping: ${order.shipping_address || '无地址'}</p>`
-        : `<p class="mb-0"><i class="bi bi-truck"></i> Face to face</p>`;
-      const html = `
-        <div class="col">
-          <div class="card product-card" data-order-id="${order.id}">
-            <div class="card-body">
-              <h5 class="card-title">${order.product}</h5>
-              <p class="card-text text-muted mb-1">Order Number: ${order.order_serial}</p>
-              <p class="fw-bold">£${order.price}</p>
-              ${deliveryInfo}
-              <p class="mb-0"><i class="bi bi-info-circle"></i> state: ${order.status}</p>
-              <p class="mb-0"><i class="bi bi-arrow-return-left"></i> Return Status: ${order.return_status || '无'}</p>
-              <p class="mb-0">${role}</p>
-              <div class="d-grid gap-2 mt-2">
-                ${order.is_buyer ? buyerButtons : sellerButtons}
-              </div>
+                <form id="reviewForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Rating (1-5)</label>
+                            <input type="number" class="form-control" name="rating" min="1" max="5" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comment</label>
+                            <textarea class="form-control" name="comment" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Upload Images (Optional)</label>
+                            <input type="file" class="form-control" name="images" multiple accept="image/*">
+                        </div>
+                        <input type="hidden" name="transaction" id="review-transaction-id">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </div>
+                </form>
             </div>
-          </div>
         </div>
-      `;
-      container.append(html);
-    });
-  }
+    </div>
 
-  // Navigation switch processing
-  $('.list-group-item').click(function() {
-    const section = $(this).data('section');
-    console.log("Switching to section:", section);
-    $('.list-group-item').removeClass('active');
-    $(this).addClass('active');
-    $('.tab-pane').removeClass('show active');
-    $('#' + section).addClass('show active');
-    if (section === 'selling') {
-      fetchListingsData();
-    } else if (section === 'likes') {
-      fetchLikesData();
-    } else if (section === 'reviews') {
-      fetchReviewsData();
-    } else if (section === 'orders') {
-      console.log("Fetching orders...");
-      fetchOrdersData();
-    } else if (section === 'settings') {
-      // The password change form has been rendered via HTML, no additional processing is required
-    }
-  });
+    <!-- Add data at the end of <body> -->
+    <script type="application/json" id="listings-data">
+        {{ listings_data|json_script:"listings-data" }}
+    </script>
+    <script type="application/json" id="likes-data">
+        {{ likes_data|json_script:"likes-data" }}
+    </script>
+    <script type="application/json" id="reviews-data">
+        {{ reviews_data|json_script:"reviews-data" }}
+    </script>
 
-  //Cancel collection processing
-  $(document).on('click', '.unlike-btn', function() {
-    const itemId = $(this).data('id');
-    const accessToken = getToken();
-    if (!accessToken) return;
-
-    $.ajax({
-      url: "{% url 'favorite-delete' 0 %}".replace(/0/, itemId),
-      type: 'DELETE',
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      xhrFields: {
-        withCredentials: true
-      },
-      success: function() {
-        fetchLikesData();
-      },
-      error: function(xhr) {
-        if (xhr.status === 401) {
-          alert('Please log in to remove a favorite.');
-          window.location.href = "{% url 'login' %}?next={% url 'account' %}";
-        } else {
-          alert('Unable to remove favorite:' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+    <!-- Script -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+$(function() {
+    // Set the global CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
         }
-      }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
     });
-  });
 
-  // Receive button
-  $(document).on('click', '.receive-btn', function() {
-    const transactionId = $(this).data('transaction-id');
-    const accessToken = getToken();
-    if (!accessToken) return;
+    // Get token
+    function getToken() {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            console.warn("No token found in localStorage. Please log in.");
+            alert("Please log in to view your account.");
+            window.location.href = "{% url 'login' %}?next={% url 'account' %}";
+            return null;
+        }
+        return token;
+    }
 
-    $.ajax({
-      url: `/api/transactions/${transactionId}/receive/`,
-      type: 'POST',
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      success: function(response) {
-        alert('Successful receipt！');
-        fetchOrdersData();
-      },
-      error: function(xhr) {
-        alert('Failed to receive goods：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
-      }
+    // Initialize user data
+    let userData = {
+        username: "{{ user.username|escapejs }}",
+        email: "{{ user.email|escapejs }}",
+        bio: "{{ user_profile.bio|default:''|escapejs }}",
+        listings: [],
+        likes: [],
+        reviews: [],
+        orders: []
+    };
+
+    // Get user's listings data
+    function fetchListingsData() {
+        const accessToken = getToken();
+        if (!accessToken) return;
+
+        const userId = {{ user.id }};
+        console.log("Fetching listings data for user ID:", userId);
+        $.ajax({
+            url: `/api/products/?seller=${userId}`,
+            type: 'GET',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            success: function(response) {
+                console.log("Listings API response:", response);
+                let listings = Array.isArray(response) ? response : (response.results || []);
+                if (!Array.isArray(listings)) {
+                    console.error("Listings data is not an array:", JSON.stringify(response, null, 2));
+                    userData.listings = [];
+                } else {
+                    userData.listings = listings.map(item => ({
+                        id: item.id,
+                        title: item.name || '',
+                        price: item.price || 0.0,
+                        image: item.image || '{% static "img/no-image.png" %}',
+                        location: item.location || 'Unknown',
+                        available_until: item.available_until || 'N/A'
+                    }));
+                }
+                renderListings(userData.listings);
+                $('[data-section="selling"]').html(`<i class="bi bi-box-seam me-2"></i>My Listings (${userData.listings.length})`);
+            },
+            error: function(xhr) {
+                console.error('Failed to fetch listings data:', xhr.status, xhr.responseText);
+                if (xhr.status === 401) {
+                    alert('Please log in to view your items.');
+                    window.location.href = "{% url 'login' %}?next={% url 'account' %}";
+                } else {
+                    alert('Unable to load product data：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+                    userData.listings = [];
+                    renderListings(userData.listings);
+                }
+            }
+        });
+    }
+
+    // Get the latest collection data
+    function fetchLikesData() {
+        const accessToken = getToken();
+        if (!accessToken) return;
+
+        console.log("Fetching likes data with token:", accessToken);
+        $.ajax({
+            url: '{% url "favorite-list" %}',
+            type: 'GET',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response, status, xhr) {
+                console.log("Likes API response:", response);
+                const contentType = xhr.getResponseHeader('Content-Type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    console.error('Unexpected response format:', response);
+                    alert('Error: The server returned a response in an unexpected format.');
+                    return;
+                }
+                userData.likes = response.map(item => ({
+                    id: item.product.id,
+                    title: item.product.name || '',
+                    price: item.product.price || 0.0,
+                    image: item.product.image || '{% static "img/no-image.png" %}',
+                    location: item.product.location || 'Unknown',
+                    available_until: item.product.available_until || 'N/A'
+                }));
+                renderLikes(userData.likes);
+                $('[data-section="likes"]').html(`<i class="bi bi-heart me-2"></i>My Likes (${userData.likes.length})`);
+            },
+            error: function(xhr) {
+                console.error('Failed to fetch likes data:', xhr.status, xhr.responseText);
+                if (xhr.status === 401) {
+                    alert('Please log in to view your collection.');
+                    window.location.href = "{% url 'login' %}?next={% url 'account' %}";
+                } else {
+                    alert("Failed to load favorite data: " + (xhr.responseJSON ? xhr.responseJSON.error : "Unknown error"));
+                }
+            }
+        });
+    }
+
+    // Get order data
+    function fetchOrdersData() {
+        const accessToken = getToken();
+        if (!accessToken) return;
+
+        console.log("Fetching orders data with token:", accessToken);
+        $.ajax({
+            url: '/api/transactions/',
+            type: 'GET',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            success: function(response) {
+                console.log("Orders Response:", JSON.stringify(response, null, 2));
+                let orders = Array.isArray(response) ? response : (response.results || []);
+                if (!Array.isArray(orders)) {
+                    console.error("Orders data is not an array:", JSON.stringify(response, null, 2));
+                    userData.orders = [];
+                } else {
+                    userData.orders = orders.map(item => ({
+                        id: item.id,
+                        product: item.product?.name || 'Unknown Product',
+                        price: item.total_price || 0.0,
+                        status: item.status || 'Unknown',
+                        delivery_method: item.delivery_method || 'Not Specified',
+                        shipping_address: item.shipping_address || 'N/A',
+                        return_status: item.return_status || 'none',
+                        order_serial: item.order_serial || 'N/A',
+                        buyer: item.buyer?.username || 'Unknown',
+                        seller: item.seller?.username || 'Unknown',
+                        is_buyer: item.buyer?.id === {{ user.id }},
+                        reviewed: item.reviewed || false
+                    }));
+                }
+                renderOrders(userData.orders);
+            },
+            error: function(xhr) {
+                console.error('Failed to fetch orders:', xhr.status, xhr.responseText);
+                if (xhr.status === 401) {
+                    alert('Please log in to view your orders.');
+                    window.location.href = "{% url 'login' %}?next={% url 'account' %}";
+                } else {
+                    alert('Failed to load orders: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+                    userData.orders = [];
+                    renderOrders(userData.orders);
+                }
+            }
+        });
+    }
+
+    // Get the user's reviews data
+    function fetchReviewsData() {
+        const accessToken = getToken();
+        if (!accessToken) return;
+
+        const userId = {{ user.id }};
+        console.log("Fetching reviews data with token:", accessToken);
+        $.ajax({
+            url: `/api/reviews/?user=${userId}`,
+            type: 'GET',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            success: function(response) {
+                console.log("Reviews API response:", response);
+                let reviews = Array.isArray(response) ? response : (response.results || []);
+                if (!Array.isArray(reviews)) {
+                    console.error("Reviews data is not an array:", JSON.stringify(response, null, 2));
+                    userData.reviews = [];
+                } else {
+                    userData.reviews = reviews.map(item => ({
+                        user: item.user?.username || 'Anonymous',
+                        rating: item.rating || 0,
+                        comment: item.comment || 'No comments'
+                    }));
+                }
+                renderReviews(userData.reviews);
+                $('[data-section="reviews"]').html(`<i class="bi bi-star me-2"></i>Reviews (${userData.reviews.length})`);
+            },
+            error: function(xhr) {
+                console.error('Failed to fetch reviews data:', xhr.status, xhr.responseText);
+                if (xhr.status === 401) {
+                    alert('Please log in to view your reviews.');
+                    window.location.href = "{% url 'login' %}?next={% url 'account' %}";
+                } else {
+                    alert('Unable to load review data: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+                    userData.reviews = [];
+                    renderReviews(userData.reviews);
+                }
+            }
+        });
+    }
+
+    // Initialize page
+    function initProfile() {
+        $('#username').text(userData.username);
+        $('#userEmail').text(userData.email);
+        $('#userBio').text(userData.bio || "No bio yet");
+        const section = new URLSearchParams(window.location.search).get('section') || 'selling';
+        $('.list-group-item').removeClass('active');
+        $('.tab-pane').removeClass('show active');
+        $(`[data-section="${section}"]`).addClass('active');
+        $(`#${section}`).addClass('show active');
+        if (section === 'selling') {
+            fetchListingsData();
+        } else if (section === 'likes') {
+            fetchLikesData();
+        } else if (section === 'reviews') {
+            fetchReviewsData();
+        } else if (section === 'orders') {
+            fetchOrdersData();
+        }
+    }
+
+    // Render My Listings
+    function renderListings(listings) {
+        const container = $('#listingContainer');
+        container.empty();
+        if (!listings || listings.length === 0) {
+            container.html(`
+                <div class="col-12 text-center py-5 empty-state">
+                    <i class="bi bi-heartbreak fs-1 text-muted"></i>
+                    <p class="mt-3">No listings available.</p>
+                </div>
+            `);
+            return;
+        }
+        listings.forEach(item => {
+            const html = `
+                <div class="col">
+                    <div class="card product-card" data-product-id="${item.id}">
+                        <a href="/detail/${item.id}/">
+                            <div class="ratio ratio-1x1">
+                                <img src="${item.image || '{% static "img/no-image.png" %}'}" class="card-img-top product-img" alt="${item.title}" loading="lazy">
+                                <div class="img-mask"></div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">${item.title || ''}</h5>
+                                <p class="card-text text-muted mb-1">Available until: ${item.available_until}</p>
+                                <p class="fw-bold">£${item.price || 0.0}</p>
+                                <p class="mb-0 text-muted"><i class="bi bi-geo-alt"></i> ${item.location}</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            `;
+            container.append(html);
+        });
+    }
+
+    // Render My Likes
+    function renderLikes(likes) {
+        const container = $('#likesContainer');
+        container.empty();
+        if (!likes || likes.length === 0) {
+            container.html(`
+                <div class="col-12 text-center py-5 empty-state">
+                    <i class="bi bi-heartbreak fs-1 text-muted"></i>
+                    <p class="mt-3">No favorites yet.</p>
+                </div>
+            `);
+            return;
+        }
+        likes.forEach(item => {
+            let availableUntil = item.available_until;
+            if (availableUntil && availableUntil !== 'N/A') {
+                const date = new Date(availableUntil);
+                availableUntil = date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+            } else {
+                availableUntil = 'N/A';
+            }
+
+            const html = `
+                <div class="col">
+                    <div class="card product-card" data-product-id="${item.id}">
+                        <a href="/detail/${item.id}/">
+                            <div class="ratio ratio-1x1">
+                                <img src="${item.image || '{% static "img/no-image.png" %}'}" class="card-img-top product-img" alt="${item.title}" loading="lazy">
+                                <div class="img-mask"></div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">${item.title || ''}</h5>
+                                <p class="card-text text-muted mb-1">Available until: ${availableUntil}</p>
+                                <p class="fw-bold">£${item.price || 0.0}</p>
+                                <p class="mb-0 text-muted"><i class="bi bi-geo-alt"></i> ${item.location}</p>
+                                <div class="d-grid gap-2 mt-2">
+                                    <button class="btn btn-outline-secondary btn-sm unlike-btn" data-id="${item.id}">
+                                        <i class="bi bi-heart-fill"></i> Unlike
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            `;
+            container.append(html);
+        });
+    }
+
+    // Render Reviews
+    function renderReviews(reviews) {
+        const container = $('#reviewsContainer');
+        container.empty();
+        if (!reviews || reviews.length === 0) {
+            container.html('<p class="text-center">No reviews yet.</p>');
+            return;
+        }
+        reviews.forEach(review => {
+            container.append(`
+                <div class="mb-3">
+                    <p><strong>${review.user || ''}</strong> rated ${review.rating || 0.0}: ${review.comment || ''}</p>
+                </div>
+            `);
+        });
+    }
+
+    // Render My Orders
+    function renderOrders(orders) {
+        const container = $('#ordersContainer');
+        container.empty();
+        if (!orders || orders.length === 0) {
+            container.html(`
+                <div class="col-12 text-center py-5 empty-state">
+                    <i class="bi bi-cart fs-1 text-muted"></i>
+                    <p class="mt-3">No orders yet.</p>
+                </div>
+            `);
+            return;
+        }
+        orders.forEach(order => {
+            const role = order.is_buyer ? `Seller: ${order.seller}` : `Buyer: ${order.buyer}`;
+            let buyerButtons = '';
+            if (order.is_buyer) {
+                const canReceive = (order.status === 'shipped' || (order.status === 'paid' && order.delivery_method === 'face-to-face')) && order.status !== 'received';
+                const receiveButton = canReceive
+                    ? `<button class="btn btn-success btn-sm receive-btn" data-transaction-id="${order.id}">Received</button>`
+                    : `<button class="btn btn-success btn-sm" disabled>Received</button>`;
+                const reviewButton = order.status === 'received' && !order.reviewed
+                    ? `<button class="btn btn-primary btn-sm review-btn" data-transaction-id="${order.id}">Review</button>`
+                    : order.status === 'received' && order.reviewed
+                        ? `<button class="btn btn-primary btn-sm" disabled>Reviewed</button>`
+                        : '';
+                const returnButton = order.status === 'received' && order.return_status === 'none'
+                    ? `<button class="btn btn-warning btn-sm return-btn" data-transaction-id="${order.id}">Request a Return</button>`
+                    : '';
+                buyerButtons = `
+                    ${receiveButton}
+                    ${reviewButton}
+                    ${returnButton}
+                `;
+            }
+            let sellerButtons = '';
+            if (!order.is_buyer) {
+                const canShip = order.status === 'paid' && order.status !== 'shipped';
+                const shipButton = canShip
+                    ? `<button class="btn btn-success btn-sm ship-btn" data-transaction-id="${order.id}">Shipped</button>`
+                    : `<button class="btn btn-success btn-sm" disabled>Shipped</button>`;
+                const returnAction = order.return_status === 'requested'
+                    ? `
+                        <select class="form-select handle-return-btn" data-transaction-id="${order.id}">
+                            <option value="">Process Return</option>
+                            <option value="approve">Approve Return</option>
+                            <option value="deny">Deny Return</option>
+                        </select>
+                    `
+                    : '';
+                sellerButtons = `
+                    ${shipButton}
+                    ${returnAction}
+                `;
+            }
+            const deliveryInfo = order.delivery_method === 'shipping'
+                ? `<p class="mb-0"><i class="bi bi-truck"></i> Shipping: ${order.shipping_address || 'No address'}</p>`
+                : `<p class="mb-0"><i class="bi bi-truck"></i> Face-to-Face</p>`;
+            const html = `
+                <div class="col">
+                    <div class="card product-card" data-order-id="${order.id}">
+                        <div class="card-body">
+                            <h5 class="card-title">${order.product}</h5>
+                            <p class="card-text text-muted mb-1">Order Number: ${order.order_serial}</p>
+                            <p class="fw-bold">£${order.price}</p>
+                            ${deliveryInfo}
+                            <p class="mb-0"><i class="bi bi-info-circle"></i> Status: ${order.status}</p>
+                            <p class="mb-0"><i class="bi bi-arrow-return-left"></i> Return Status: ${order.return_status}</p>
+                            <p class="mb-0">${role}</p>
+                            <div class="d-grid gap-2 mt-2">
+                                ${order.is_buyer ? buyerButtons : sellerButtons}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.append(html);
+        });
+    }
+
+    // Navigation switch processing
+    $('.list-group-item').click(function() {
+        const section = $(this).data('section');
+        console.log("Switching to section:", section);
+        $('.list-group-item').removeClass('active');
+        $(this).addClass('active');
+        $('.tab-pane').removeClass('show active');
+        $('#' + section).addClass('show active');
+        if (section === 'selling') {
+            fetchListingsData();
+        } else if (section === 'likes') {
+            fetchLikesData();
+        } else if (section === 'reviews') {
+            fetchReviewsData();
+        } else if (section === 'orders') {
+            console.log("Fetching orders...");
+            fetchOrdersData();
+        } else if (section === 'settings') {
+            // The password change form has been rendered via HTML, no additional processing is required
+        }
     });
-  });
 
- //Shipping button
-  $(document).on('click', '.ship-btn', function() {
-    const transactionId = $(this).data('transaction-id');
-    const accessToken = getToken();
-    if (!accessToken) return;
+    // Cancel collection processing
+    $(document).on('click', '.unlike-btn', function() {
+        const itemId = $(this).data('id');
+        const accessToken = getToken();
+        if (!accessToken) return;
 
-    $.ajax({
-      url: `/api/transactions/${transactionId}/ship/`,
-      type: 'POST',
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      success: function(response) {
-        alert('Delivery Success！');
-        fetchOrdersData();
-      },
-      error: function(xhr) {
-        alert('Delivery failed：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
-      }
+        $.ajax({
+            url: "{% url 'favorite-delete' 0 %}".replace(/0/, itemId),
+            type: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function() {
+                fetchLikesData();
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    alert('Please log in to remove a favorite.');
+                    window.location.href = "{% url 'login' %}?next={% url 'account' %}";
+                } else {
+                    alert('Unable to remove favorite: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+                }
+            }
+        });
     });
-  });
 
-  // Request return button
-  $(document).on('click', '.return-btn', function() {
-    const transactionId = $(this).data('transaction-id');
-    const reason = prompt('Please enter the reason for return：');
-    if (!reason) return;
-    const accessToken = getToken();
-    if (!accessToken) return;
+    // Receive button
+    $(document).on('click', '.receive-btn', function() {
+        const transactionId = $(this).data('transaction-id');
+        const accessToken = getToken();
+        if (!accessToken) return;
 
-    $.ajax({
-      url: `/api/transactions/${transactionId}/return/request/`,
-      type: 'POST',
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      data: { reason: reason },
-      success: function(response) {
-        alert('Return request submitted!');
-        fetchOrdersData();
-      },
-      error: function(xhr) {
-        alert('Return request failed：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
-      }
+        $.ajax({
+            url: `/api/transactions/${transactionId}/receive/`,
+            type: 'POST',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            success: function(response) {
+                alert('Successfully received!');
+                fetchOrdersData();
+            },
+            error: function(xhr) {
+                alert('Failed to receive goods: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+            }
+        });
     });
-  });
 
-  // Process Returns drop-down box
-  $(document).on('change', '.handle-return-btn', function() {
-    const transactionId = $(this).data('transaction-id');
-    const action = $(this).val();
-    if (!action) return;
-    const accessToken = getToken();
-    if (!accessToken) return;
+    // Shipping button
+    $(document).on('click', '.ship-btn', function() {
+        const transactionId = $(this).data('transaction-id');
+        const accessToken = getToken();
+        if (!accessToken) return;
 
-    $.ajax({
-      url: `/api/transactions/${transactionId}/return/handle/`,
-      type: 'POST',
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      data: { action: action },
-      success: function(response) {
-        alert(`Return has been ${action === 'approve' ? 'Agree' : 'Reject'}！`);
-        fetchOrdersData();
-      },
-      error: function(xhr) {
-        alert(`Return processing failed：` + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
-      }
+        $.ajax({
+            url: `/api/transactions/${transactionId}/ship/`,
+            type: 'POST',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            success: function(response) {
+                alert('Shipped successfully!');
+                fetchOrdersData();
+            },
+            error: function(xhr) {
+                alert('Shipping failed: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+            }
+        });
     });
-  });
 
-  // Open the review modal box
-  $(document).on('click', '.review-btn', function() {
-    const transactionId = $(this).data('transaction-id');
-    $('#review-transaction-id').val(transactionId);
-    $('#reviewModal').modal('show');
-  });
+    // Request return button
+    $(document).on('click', '.return-btn', function() {
+        const transactionId = $(this).data('transaction-id');
+        const reason = prompt('Please enter the reason for return:');
+        if (!reason) return;
+        const accessToken = getToken();
+        if (!accessToken) return;
 
-  // Submit Review
-  $('#reviewForm').submit(function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    const transactionId = $('#review-transaction-id').val();
-    const accessToken = getToken();
-    if (!accessToken) return;
-
-    $.ajax({
-      url: `/api/reviews/`,
-      type: 'POST',
-      data: formData,
-      processData: false,
-      contentType: false,
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      success: function(response) {
-        alert('Review submitted successfully！');
-        $('#reviewModal').modal('hide');
-        fetchOrdersData();
-      },
-      error: function(xhr) {
-        alert('Review submission failed：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
-      }
+        $.ajax({
+            url: `/api/transactions/${transactionId}/return/request/`,
+            type: 'POST',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            data: { reason: reason },
+            success: function(response) {
+                alert('Return request submitted!');
+                fetchOrdersData();
+            },
+            error: function(xhr) {
+                alert('Return request failed: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+            }
+        });
     });
-  });
 
-  // Password modification submission processing
-  $('#passwordForm').submit(function(e) {
-    e.preventDefault();
-    const formData = $(this).serialize();
-    const accessToken = getToken();
-    if (!accessToken) return;
+    // Process Returns drop-down box
+    $(document).on('change', '.handle-return-btn', function() {
+        const transactionId = $(this).data('transaction-id');
+        const action = $(this).val();
+        if (!action) return;
+        const accessToken = getToken();
+        if (!accessToken) return;
 
-    $.ajax({
-      url: '{% url "change_password" %}',
-      type: 'POST',
-      data: formData,
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      xhrFields: {
-        withCredentials: true
-      },
-      success: function(response) {
-        alert('Password updated successfully！');
-      },
-      error: function(xhr) {
-        alert('Password update failed：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
-      }
+        $.ajax({
+            url: `/api/transactions/${transactionId}/return/handle/`,
+            type: 'POST',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            data: { action: action },
+            success: function(response) {
+                alert(`Return has been ${action === 'approve' ? 'Approved' : 'Denied'}!`);
+                fetchOrdersData();
+            },
+            error: function(xhr) {
+                alert(`Return processing failed: ` + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+            }
+        });
     });
-  });
 
-  // Avatar upload processing
-  $('#avatar-input').change(function(e) {
-    var formData = new FormData($('#avatar-form')[0]);
-    const accessToken = getToken();
-    if (!accessToken) return;
-
-    $.ajax({
-      url: '{% url "upload_avatar" %}',
-      type: 'POST',
-      data: formData,
-      processData: false,
-      contentType: false,
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      xhrFields: {
-        withCredentials: true
-      },
-      success: function(response) {
-        $('#avatar-img').attr('src', response.avatar);
-        userData.avatar = response.avatar;
-        alert('Avatar uploaded successfully！');
-        window.location.href = "{% url 'account' %}";
-      },
-      error: function(xhr) {
-        alert('Upload failed：' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
-      }
+    // Open the review modal box
+    $(document).on('click', '.review-btn', function() {
+        const transactionId = $(this).data('transaction-id');
+        $('#review-transaction-id').val(transactionId);
+        $('#reviewModal').modal('show');
     });
-  });
 
- // Initialize the page
-  initProfile();
+    // Submit Review
+    $('#reviewForm').submit(function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const transactionId = $('#review-transaction-id').val();
+        const accessToken = getToken();
+        if (!accessToken) return;
+
+        $.ajax({
+            url: `/api/reviews/`,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            success: function(response) {
+                alert('Review submitted successfully!');
+                $('#reviewModal').modal('hide');
+                fetchOrdersData();
+            },
+            error: function(xhr) {
+                alert('Review submission failed: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+            }
+        });
+    });
+
+    // Password modification submission processing
+    $('#passwordForm').submit(function(e) {
+        e.preventDefault();
+        const formData = $(this).serialize();
+        const accessToken = getToken();
+        if (!accessToken) return;
+
+        $.ajax({
+            url: '{% url "change_password" %}',
+            type: 'POST',
+            data: formData,
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                alert('Password updated successfully!');
+            },
+            error: function(xhr) {
+                alert('Password update failed: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+            }
+        });
+    });
+
+    // Avatar upload processing
+    $('#avatar-input').change(function(e) {
+        var formData = new FormData($('#avatar-form')[0]);
+        const accessToken = getToken();
+        if (!accessToken) return;
+
+        $.ajax({
+            url: '{% url "upload_avatar" %}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                $('#avatar-img').attr('src', response.avatar);
+                userData.avatar = response.avatar;
+                alert('Avatar uploaded successfully!');
+                window.location.href = "{% url 'account' %}";
+            },
+            error: function(xhr) {
+                alert('Upload failed: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+            }
+        });
+    });
+
+    // Initialize the page
+    initProfile();
 });
-</script></body>
+    </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9234e75dbed1bcbc',t:'MTc0MjQ3MDUwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
 </html>

@@ -1,144 +1,46 @@
+# test_api.py
 import os
 import django
-import requests
+from django.core.files import File
+from django.contrib.auth import get_user_model
 
-# 设置 Django 环境
+# 设置 DJANGO_SETTINGS_MODULE 环境变量
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'secondhand_marketplace.settings')
+
+# 配置 Django
 django.setup()
 
-# 导入模型
-from apps.users.models import User
-from apps.products.models import Product, Category
-from apps.transactions.models import Transaction
+# 获取 User 模型
+User = get_user_model()
 
+# 查找用户名为 Unitedkingdom 的用户
+try:
+    user = User.objects.get(username='Unitedkingdom')
+    print(f"找到用户: {user.username}")
+except User.DoesNotExist:
+    print("用户 Unitedkingdom 不存在，请先创建该用户")
+    exit()
 
-# 准备测试数据
-def setup_test_data():
-    # 创建或获取 admin 用户（seller 和 buyer）
-    admin_user, created = User.objects.get_or_create(
-        username='admin',
-        defaults={
-            'email': 'admin@example.com',
-            'first_name': 'Admin',
-            'last_name': 'User',
-            'is_superuser': True,
-            'is_staff': True,
-            'is_approved': False
-        }
+# 头像文件的路径
+avatar_path = r"C:\Users\Louis\Desktop\微信截图_20250320155940.png"
+
+# 确保文件存在
+if not os.path.exists(avatar_path):
+    print(f"文件 {avatar_path} 不存在，请检查路径")
+    exit()
+
+# 打开文件并上传
+with open(avatar_path, 'rb') as f:
+    # 如果用户已有头像，先删除旧头像
+    if user.avatar:
+        user.avatar.delete(save=False)  # 删除旧文件，但不保存用户对象
+        print("已删除旧头像")
+
+    # 上传新头像
+    user.avatar.save(
+        os.path.basename(avatar_path),  # 文件名
+        File(f),  # 文件对象
+        save=True  # 保存用户对象
     )
-    if created:
-        admin_user.set_password('admin123')
-        admin_user.save()
-
-    # 创建或获取普通用户（buyer）
-    buyer_user, created = User.objects.get_or_create(
-        username='buyer',
-        defaults={
-            'email': 'buyer@example.com',
-            'first_name': 'Buyer',
-            'last_name': 'User',
-            'is_approved': False
-        }
-    )
-    if created:
-        buyer_user.set_password('buyer123')
-        buyer_user.save()
-
-    # 创建或获取 Category
-    category, _ = Category.objects.get_or_create(name="Test Category")
-
-    # 创建或获取 Product
-    product, _ = Product.objects.get_or_create(
-        name="Test Product",
-        defaults={
-            'price': 99.99,
-            'status': 'available',
-            'category': category,
-            'seller': admin_user,
-            'is_approved': False
-        }
-    )
-
-    # 创建或获取 Transaction
-    transaction, _ = Transaction.objects.get_or_create(
-        product=product,
-        buyer=buyer_user,
-        defaults={
-            'status': 'pending',
-            'total_price': 99.99  # 确保与 product.price 一致
-        }
-    )
-
-
-BASE_URL = "http://127.0.0.1:8000/api/admin/"
-ADMIN_USERNAME = "Ciciyizi"
-ADMIN_PASSWORD = "ly2002216"
-
-
-def get_admin_token(username, password):
-    url = "http://127.0.0.1:8000/api/users/login/"
-    data = {"username_or_email": username, "password": password}
-    response = requests.post(url, json=data)
-    if response.status_code == 200:
-        print("✅ Admin login successful:", response.json())
-        return response.json().get("access")
-    else:
-        print("❌ Admin login failed:", response.status_code, response.json())
-        return None
-
-
-def test_approve_user(token, user_id):
-    url = f"{BASE_URL}users/{user_id}/"
-    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    data = {"is_approved": True}
-    print(f"Testing approve user for user_id={user_id} with data={data}")
-    response = requests.patch(url, json=data, headers=headers)
-    try:
-        print(f"User approval: {response.status_code} {response.json()}")
-    except ValueError as e:
-        print(f"❌ User approval failed: {response.status_code} {response.text}")
-
-
-def test_approve_product(token, product_id):
-    url = f"{BASE_URL}products/{product_id}/approve/"
-    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    data = {"is_approved": True}
-    print(f"Testing approve product for product_id={product_id} with data={data}")
-    response = requests.patch(url, json=data, headers=headers)
-    try:
-        print(f"Product approval: {response.status_code} {response.json()}")
-    except ValueError as e:
-        print(f"❌ Product approval failed: {response.status_code} {response.text}")
-
-
-def test_update_transaction_status(token, transaction_id, status):
-    url = f"{BASE_URL}transactions/{transaction_id}/"
-    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    data = {"status": status}
-    print(f"Testing transaction status update for transaction_id={transaction_id} with data={data}")
-    response = requests.patch(url, json=data, headers=headers)
-    try:
-        print(f"Transaction status update: {response.status_code} {response.json()}")
-    except ValueError as e:
-        print(f"❌ Transaction status update failed: {response.status_code} {response.text}")
-
-
-if __name__ == "__main__":
-    # 准备测试数据
-    setup_test_data()
-
-    token = get_admin_token(ADMIN_USERNAME, ADMIN_PASSWORD)
-    if token:
-        # 获取 admin 用户的 id
-        admin_user = User.objects.get(username='admin')
-        test_approve_user(token, user_id=admin_user.id)
-
-        # 获取产品的 id
-        test_product = Product.objects.get(name="Test Product")
-        test_approve_product(token, product_id=test_product.id)
-
-        # 获取交易的 id
-        test_transaction = Transaction.objects.get(status="pending")
-        test_update_transaction_status(token, transaction_id=test_transaction.id, status="shipped")
-    else:
-        print("❌ Token retrieval failed, tests aborted!")
+    print(f"头像已上传，路径: {user.avatar.path}")
+    print(f"头像 URL: {user.avatar.url}")

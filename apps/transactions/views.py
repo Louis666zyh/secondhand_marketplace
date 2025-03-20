@@ -30,7 +30,7 @@ class TransactionListView(generics.ListCreateAPIView):
         try:
             product = Product.objects.get(id=product_id)
             if product.status != "available":
-                raise ValidationError({"product": "Product is not available."})
+                raise ValidationError({"error": "This item has already been sold."})
             # 设置 seller 为产品的卖家
             serializer.save(buyer=self.request.user, product=product, seller=product.seller)
         except Product.DoesNotExist:

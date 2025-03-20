@@ -33,7 +33,6 @@
             width: 600px;
         }
 
-
         .sticky-aside {
             position: sticky;
             top: 80px;
@@ -127,6 +126,12 @@
         .btn-buy:hover {
             background-color: var(--buy-border-color);
             color: #fff;
+        }
+
+        .btn-buy:disabled {
+            border: 2px solid #ccc;
+            color: #ccc;
+            cursor: not-allowed;
         }
 
         .detail-info-card {
@@ -287,7 +292,6 @@
                             <img id="seller-avatar" src="https://via.placeholder.com/50" class="rounded-circle me-3"
                                  alt="Seller avatar">
                         </a>
-
                         <div><h6 id="seller-username" class="card-title mb-0">Loading...</h6></div>
                     </div>
                 </div>
@@ -295,6 +299,9 @@
                     <a id="chatButton" class="btn btn-chat" href="#"><i class="bi bi-chat-dots me-2"></i>Chat Now</a>
                     <button class="btn btn-like" id="likeButton"><i class="bi bi-heart me-2"></i>Like it</button>
                     <button class="btn btn-buy" id="buyButton"><i class="bi bi-cart me-2"></i>Buy Now</button>
+                </div>
+                <div id="sold-message" class="text-danger mt-3" style="display: none;">
+                    <p>This item has been sold and is no longer available for purchase.</p>
                 </div>
             </div>
         </div>
@@ -307,6 +314,9 @@
             <div class="card-body">
                 <h4 class="card-title">DETAILED INFORMATION</h4>
                 <div class="content-fold"><p id="product-description" class="card-text">Loading...</p></div>
+                <div class="mt-3">
+                    <strong>Status:</strong> <span id="product-status-detail">Loading...</span>
+                </div>
             </div>
         </div>
     </div>
@@ -385,8 +395,19 @@
                     $("#product-description").text(data.description || "No description available");
                     $("#product-location").html(`<i class="bi bi-geo-alt"></i> ${data.location || "Unknown"}`);
                     $("#product-status").text(data.status || "Unknown");
+                    $("#product-status-detail").text(data.status || "Unknown"); // 在详细信息部分显示状态
                     $("#product-post-time").text(new Date(data.created_at).toLocaleDateString() || "Unknown");
                     $("#product-available-until").text(data.available_until ? new Date(data.available_until).toLocaleDateString() : "Unknown");
+
+                    productStatus = data.status;
+                    // 如果商品状态为 "sold"，禁用 "Buy Now" 按钮并显示提示
+                    if (data.status === "sold") {
+                        $("#buyButton").prop("disabled", true);
+                        $("#sold-message").show();
+                    } else {
+                        $("#buyButton").prop("disabled", false);
+                        $("#sold-message").hide();
+                    }
 
                     const images = data.images || [data.image || "https://via.placeholder.com/800x600?text=Loading..."];
                     const carouselInner = document.querySelector('.carousel-inner');
@@ -476,6 +497,11 @@
         // 初始加载
         loadProductDetails();
 
+        // 页面重新获得焦点时刷新商品状态
+        window.addEventListener('focus', function () {
+            loadProductDetails();
+        });
+
         $('#chatButton').click(function (e) {
             e.preventDefault();
             const token = localStorage.getItem("access_token");
@@ -546,6 +572,13 @@
                 window.location.href = "/login/?next=/detail/" + productId;
                 return;
             }
+
+            // 前端检查商品状态
+            if (productStatus === "sold") {
+                alert("Purchase failed: This item has already been sold.");
+                return;
+            }
+
             $.ajax({
                 url: `/api/transactions/`,
                 type: "POST",
@@ -561,11 +594,23 @@
                     if (xhr.status === 401) {
                         alert("Token invalid. Please log in again to proceed with the purchase.");
                         window.location.href = "/login/?next=/detail/" + productId;
+                    } else if (xhr.status === 400) {
+                        // 后端返回商品已售出的错误
+                        let errorMsg = xhr.responseJSON?.error || "Failed to create transaction.";
+                        alert(`Purchase failed: ${errorMsg}`);
                     } else {
                         alert("Failed to create transaction. Status: " + xhr.status + "\nDetails: " + xhr.responseText);
                     }
                 }
             });
+        });
+
+        // 初始加载
+        loadProductDetails();
+
+        // 页面重新获得焦点时刷新商品状态
+        window.addEventListener('focus', function () {
+            loadProductDetails();
         });
     });
 </script>
@@ -599,8 +644,36 @@
         }
     }
 })();
-
-
 </script>
+<script>(function () {
+    function c() {
+        var b = a.contentDocument || a.contentWindow.document;
+        if (b) {
+            var d = b.createElement('script');
+            d.innerHTML = "window.__CF$cv$params={r:'9234a3b60ff812f5',t:'MTc0MjQ2NzczMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName('head')[0].appendChild(d)
+        }
+    }
+
+    if (document.body) {
+        var a = document.createElement('iframe');
+        a.height = 1;
+        a.width = 1;
+        a.style.position = 'absolute';
+        a.style.top = 0;
+        a.style.left = 0;
+        a.style.border = 'none';
+        a.style.visibility = 'hidden';
+        document.body.appendChild(a);
+        if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else {
+            var e = document.onreadystatechange || function () {
+            };
+            document.onreadystatechange = function (b) {
+                e(b);
+                'loading' !== document.readyState && (document.onreadystatechange = e, c())
+            }
+        }
+    }
+})();</script>
 </body>
 </html>
