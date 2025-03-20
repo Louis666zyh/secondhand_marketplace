@@ -1,46 +1,31 @@
-# test_api.py
-import os
-import django
-from django.core.files import File
-from django.contrib.auth import get_user_model
+import requests
 
-# 设置 DJANGO_SETTINGS_MODULE 环境变量
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'secondhand_marketplace.settings')
+BASE_URL = "http://127.0.0.1:8000/api/"
+ADMIN_USERNAME = "Ciciyizi"
+ADMIN_PASSWORD = "ly2002216"
 
-# 配置 Django
-django.setup()
+def get_token():
+    """Retrieve authentication token"""
+    response = requests.post(BASE_URL + "users/login/", json={"username_or_email": ADMIN_USERNAME, "password": ADMIN_PASSWORD})
+    return response.json().get("access")
 
-# 获取 User 模型
-User = get_user_model()
+def post_review(token, product_id, rating, comment):
+    """Post a review for a product"""
+    url = BASE_URL + "reviews/"
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    data = {"product": product_id, "rating": rating, "comment": comment}
 
-# 查找用户名为 Unitedkingdom 的用户
-try:
-    user = User.objects.get(username='Unitedkingdom')
-    print(f"找到用户: {user.username}")
-except User.DoesNotExist:
-    print("用户 Unitedkingdom 不存在，请先创建该用户")
-    exit()
+    response = requests.post(url, json=data, headers=headers)
+    print("✅ Post Review Response:", response.status_code, response.json())
 
-# 头像文件的路径
-avatar_path = r"C:\Users\Louis\Desktop\微信截图_20250320155940.png"
+def get_reviews(product_id):
+    """Retrieve reviews for a product"""
+    url = BASE_URL + f"reviews/?product={product_id}"
+    response = requests.get(url)
+    print("✅ Get Reviews Response:", response.status_code, response.json())
 
-# 确保文件存在
-if not os.path.exists(avatar_path):
-    print(f"文件 {avatar_path} 不存在，请检查路径")
-    exit()
-
-# 打开文件并上传
-with open(avatar_path, 'rb') as f:
-    # 如果用户已有头像，先删除旧头像
-    if user.avatar:
-        user.avatar.delete(save=False)  # 删除旧文件，但不保存用户对象
-        print("已删除旧头像")
-
-    # 上传新头像
-    user.avatar.save(
-        os.path.basename(avatar_path),  # 文件名
-        File(f),  # 文件对象
-        save=True  # 保存用户对象
-    )
-    print(f"头像已上传，路径: {user.avatar.path}")
-    print(f"头像 URL: {user.avatar.url}")
+if __name__ == "__main__":
+    token = get_token()
+    if token:
+        post_review(token, product_id=1, rating=5, comment="Great product!")
+        get_reviews(product_id=1)

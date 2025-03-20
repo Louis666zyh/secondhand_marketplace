@@ -1,10 +1,8 @@
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.pagination import PageNumberPagination
-
 from .models import Product, Category
 from .serializers import ProductSerializer, CategorySerializer
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -36,7 +34,7 @@ class ProductListView(generics.ListCreateAPIView):
         search = self.request.query_params.get("search", None)
         available_until = self.request.query_params.get("available_until__lte", None)
         location = self.request.query_params.get("location", None)
-        seller = self.request.query_params.get("seller", None)  # 新增 seller 参数
+        seller = self.request.query_params.get("seller", None)
 
         if seller:
             try:
@@ -65,7 +63,6 @@ class ProductListView(generics.ListCreateAPIView):
         if location:
             queryset = queryset.filter(location__iexact=location)
 
-        # 排除当前用户的商品（仅在未指定 seller 参数时应用）
         if not seller and self.request.user.is_authenticated:
             queryset = queryset.exclude(seller=self.request.user)
 
@@ -73,7 +70,7 @@ class ProductListView(generics.ListCreateAPIView):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(seller=self.request.user)
+        serializer.save(seller=self.request.user, is_approved=True)
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
@@ -109,20 +106,18 @@ def product_detail(request, pk):
 
 def search_view(request):
     query = request.GET.get('q', '')
-    # 使用 Product 模型，并确保只搜索可用商品
     results = Product.objects.filter(
         name__icontains=query,
-        status='available',  # 仅显示可用商品
-        is_approved=True  # 仅显示已批准的商品
+        status='available',
+        is_approved=True
     ).values('id', 'name', 'price', 'image', 'available_until', 'location')
 
-    # 处理 image 字段，确保返回 URL
     results = [
         {
             'id': item['id'],
             'name': item['name'],
-            'price': float(item['price']),  # Decimal 转换为 float
-            'image': item['image'] if item['image'] else '',  # 确保 image 字段不为空
+            'price': float(item['price']),
+            'image': item['image'] if item['image'] else '',
             'available_until': item['available_until'].isoformat() if item['available_until'] else '',
             'location': item['location'] if item['location'] else 'Unknown'
         }
@@ -130,3 +125,11 @@ def search_view(request):
     ]
 
     return JsonResponse(results, safe=False)
+
+class ProductDeleteView(APIView):
+    def delete(self, request, pk, format=None):
+        product = get_object_or_404(Product, pk=pk)
+        if request.user.is_staff or request.user == product.seller:
+            product.delete()
+            return Response({"message": f"Product '{product.name}' has been deleted."}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"error": "You do not have permission to delete this product."}, status=status.HTTP_403_FORBIDDEN)

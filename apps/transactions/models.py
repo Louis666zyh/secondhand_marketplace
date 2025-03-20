@@ -2,6 +2,7 @@ from django.db import models
 from apps.products.models import Product
 from apps.users.models import User
 
+
 class Transaction(models.Model):
     """
     Model for transactions on the platform.
